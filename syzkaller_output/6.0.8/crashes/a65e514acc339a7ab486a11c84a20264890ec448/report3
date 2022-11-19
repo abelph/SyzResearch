@@ -1,0 +1,4 @@
+2022/11/18 01:11:07 SYZFATAL: executor 1 failed 11 times: executor 1: exit status 67
+SYZFAIL: ebtable checkpoint: socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
+ (errno 2: No such file or directory)
+loop exited with status 67

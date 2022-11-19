@@ -1,0 +1,5 @@
+# {Threaded:true Repeat:true RepeatTimes:0 Procs:1 Slowdown:1 Sandbox:none SandboxArg:0 Leak:false NetInjection:false NetDevices:true NetReset:true Cgroups:true BinfmtMisc:true CloseFDs:true KCSAN:false DevlinkPCI:false NicVF:false USB:false VhciInjection:false Wifi:false IEEE802154:false Sysctl:true UseTmpDir:true HandleSegv:true Repro:false Trace:false LegacyOptions:{Collide:false Fault:false FaultCall:0 FaultNth:0}}
+r0 = syz_init_net_socket$nl_generic(0x10, 0x3, 0x10)
+r1 = syz_init_net_socket$nl_generic(0x10, 0x3, 0x10)
+r2 = syz_genetlink_get_family_id$netlbl_mgmt(&(0x7f0000000340), r1)
+sendmsg$NLBL_MGMT_C_ADD(r0, &(0x7f0000000480)={0x0, 0x0, &(0x7f0000000440)={&(0x7f0000000000)=ANY=[@ANYBLOB='4\x00\x00\x00', @ANYRES16=r2, @ANYBLOB="01000000000008000200050000000800c600e0000011070001002a2200000000000000000000000000000000000085480b8c2ebe9f17324a7c80a6d50a27e12f472df51f98535d432728c6"], 0x34}}, 0x0)

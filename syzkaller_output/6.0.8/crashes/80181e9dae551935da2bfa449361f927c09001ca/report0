@@ -1,0 +1,147 @@
+==================================================================
+BUG: KASAN: use-after-free in task_work_run+0x109/0x180
+Read of size 8 at addr ffff88800856b940 by task syz-executor.2/29212
+
+CPU: 0 PID: 29212 Comm: syz-executor.2 Not tainted 6.0.8 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x4d/0x66
+ print_report.cold+0x5e/0x5e5
+ kasan_report+0xa3/0x130
+ task_work_run+0x109/0x180
+ do_exit+0x916/0x22e0
+ do_group_exit+0xb5/0x2a0
+loop1: detected capacity change from 0 to 4096
+ get_signal+0x1a6c/0x1d40
+ arch_do_signal_or_restart+0x89/0x1b30
+ exit_to_user_mode_prepare+0xa2/0x120
+ syscall_exit_to_user_mode+0x1d/0x40
+ do_syscall_64+0x48/0x90
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f74da452efd
+Code: Unable to access opcode bytes at RIP 0x7f74da452ed3.
+RSP: 002b:00007f74d97c4028 EFLAGS: 00000246 ORIG_RAX: 000000000000012a
+RAX: 0000000000000003 RBX: 00007f74da590f80 RCX: 00007f74da452efd
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000200002c0
+RBP: 00007f74da4c4afc R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000016 R14: 00007f74da590f80 R15: 00007f74d97a4000
+ </TASK>
+
+Allocated by task 29212:
+ kasan_save_stack+0x1e/0x40
+ __kasan_slab_alloc+0x66/0x80
+ kmem_cache_alloc_node+0xdc/0x220
+ perf_event_alloc.part.0+0xb8/0x32b0
+ __do_sys_perf_event_open+0x36d/0x2550
+ do_syscall_64+0x38/0x90
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Freed by task 4085:
+ kasan_save_stack+0x1e/0x40
+ kasan_set_track+0x21/0x30
+ kasan_set_free_info+0x20/0x40
+ __kasan_slab_free+0x108/0x190
+ kmem_cache_free+0x9c/0x340
+ rcu_core+0x5a0/0x1880
+ __do_softirq+0x1a0/0x5ae
+
+Last potentially related work creation:
+ kasan_save_stack+0x1e/0x40
+ __kasan_record_aux_stack+0x96/0xb0
+ call_rcu+0x6a/0xa00
+ perf_event_release_kernel+0x5ac/0x790
+ perf_release+0x33/0x50
+ __fput+0x220/0xa10
+ task_work_run+0xdb/0x180
+ do_exit+0x916/0x22e0
+ do_group_exit+0xb5/0x2a0
+ get_signal+0x1a6c/0x1d40
+ arch_do_signal_or_restart+0x89/0x1b30
+ exit_to_user_mode_prepare+0xa2/0x120
+ syscall_exit_to_user_mode+0x1d/0x40
+ do_syscall_64+0x48/0x90
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x1e/0x40
+ __kasan_record_aux_stack+0x96/0xb0
+ task_work_add+0x3b/0x1a0
+ event_sched_out.part.0+0x95f/0xbc0
+ __perf_remove_from_context+0x586/0xb40
+ event_function+0x21c/0x320
+ remote_function+0x10d/0x190
+ __flush_smp_call_function_queue+0x15f/0x480
+ __sysvec_call_function_single+0x62/0x200
+ sysvec_call_function_single+0x89/0xc0
+ asm_sysvec_call_function_single+0x16/0x20
+
+The buggy address belongs to the object at ffff88800856b600
+ which belongs to the cache perf_event of size 1024
+The buggy address is located 832 bytes inside of
+ 1024-byte region [ffff88800856b600, ffff88800856ba00)
+
+The buggy address belongs to the physical page:
+page:00000000211322d4 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88800856ba80 pfn:0x8568
+head:00000000211322d4 order:2 compound_mapcount:0 compound_pincount:0
+flags: 0x100000000010200(slab|head|node=0|zone=1)
+raw: 0100000000010200 dead000000000100 dead000000000122 ffff88800104ddc0
+raw: ffff88800856ba80 00000000800e0008 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88800856b800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88800856b880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88800856b900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                           ^
+ ffff88800856b980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88800856ba00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+loop7: detected capacity change from 0 to 2048
+loop3: detected capacity change from 0 to 32834
+ISOFS: Unable to identify CD-ROM format.
+EXT4-fs warning (device loop7): ext4_enable_quotas:6801: Failed to enable quota tracking (type=0, err=-13). Please run e2fsck to fix.
+EXT4-fs (loop7): mount failed
+loop3: detected capacity change from 0 to 32834
+ISOFS: Unable to identify CD-ROM format.
+loop7: detected capacity change from 0 to 2048
+loop3: detected capacity change from 0 to 32834
+ISOFS: Unable to identify CD-ROM format.
+EXT4-fs warning (device loop7): ext4_enable_quotas:6801: Failed to enable quota tracking (type=0, err=-13). Please run e2fsck to fix.
+EXT4-fs (loop7): mount failed
+I/O error, dev loop3, sector 32640 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 2
+loop6: detected capacity change from 0 to 2097151
+netlink: 212 bytes leftover after parsing attributes in process `syz-executor.4'.
+loop5: detected capacity change from 0 to 512
+ext4: Unknown parameter 'ÆðT§>ý'
+netlink: 212 bytes leftover after parsing attributes in process `syz-executor.4'.
+loop3: detected capacity change from 0 to 8
+loop5: detected capacity change from 0 to 512
+ext4: Unknown parameter 'ÆðT§>ý'
+loop5: detected capacity change from 0 to 512
+ext4: Unknown parameter 'ÆðT§>ý'
+loop5: detected capacity change from 0 to 512
+ext4: Unknown parameter './file0'
+loop5: detected capacity change from 0 to 512
+netlink: 212 bytes leftover after parsing attributes in process `syz-executor.4'.
+loop5: detected capacity change from 0 to 512
+ext4: Unknown parameter './file0'
+netlink: 212 bytes leftover after parsing attributes in process `syz-executor.4'.
+loop3: detected capacity change from 0 to 8
+netlink: 212 bytes leftover after parsing attributes in process `syz-executor.4'.
+device lo entered promiscuous mode
+loop3: detected capacity change from 0 to 8
+loop2: detected capacity change from 0 to 71
+device lo entered promiscuous mode
+device lo left promiscuous mode
+device lo left promiscuous mode
+loop2: detected capacity change from 0 to 71
+device lo entered promiscuous mode
+9pnet: Could not find request transport: rdma
+device lo left promiscuous mode
+loop4: detected capacity change from 0 to 512
+FAT-fs (loop4): bogus number of reserved sectors
+FAT-fs (loop4): Can't find a valid FAT filesystem
+9pnet: Could not find request transport: rdma
+9pnet: Could not find request transport: rdma
