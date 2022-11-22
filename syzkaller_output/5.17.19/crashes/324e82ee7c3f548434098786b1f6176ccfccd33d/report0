@@ -1,0 +1,194 @@
+==================================================================
+BUG: KASAN: stack-out-of-bounds in profile_pc+0x116/0x130 arch/x86/kernel/time.c:44
+Read of size 8 at addr ffff888001fe7b88 by task syz-executor.4/427
+
+CPU: 1 PID: 427 Comm: syz-executor.4 Not tainted 5.15.79 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x4d/0x66 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ profile_pc+0x116/0x130 arch/x86/kernel/time.c:44
+ profile_tick+0x8f/0xd0 kernel/profile.c:416
+ tick_sched_timer+0x15b/0x1c0 kernel/time/tick-sched.c:1420
+ __run_hrtimer kernel/time/hrtimer.c:1685 [inline]
+ __hrtimer_run_queues+0x3bb/0x7c0 kernel/time/hrtimer.c:1749
+ hrtimer_interrupt+0x2c9/0x6c0 kernel/time/hrtimer.c:1811
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1086 [inline]
+ __sysvec_apic_timer_interrupt+0xc5/0x260 arch/x86/kernel/apic/apic.c:1103
+ sysvec_apic_timer_interrupt+0x65/0x90 arch/x86/kernel/apic/apic.c:1097
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x16/0x20 arch/x86/include/asm/idtentry.h:638
+RIP: 0010:native_save_fl arch/x86/include/asm/irqflags.h:29 [inline]
+RIP: 0010:arch_local_save_flags arch/x86/include/asm/irqflags.h:70 [inline]
+RIP: 0010:arch_local_irq_save arch/x86/include/asm/irqflags.h:106 [inline]
+RIP: 0010:__raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:108 [inline]
+RIP: 0010:_raw_spin_lock_irqsave+0x57/0xe0 kernel/locking/spinlock.c:162
+Code: 48 c7 44 24 10 a0 d9 49 ba 48 01 d8 c7 00 f1 f1 f1 f1 c7 40 04 04 f3 f3 f3 65 48 8b 04 25 28 00 00 00 48 89 44 24 58 31 c0 9c <41> 5c fa be 04 00 00 00 c7 44 24 20 00 00 00 00 e8 f4 58 d6 fd be
+RSP: 0018:ffff888001fe7b80 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: 1ffff110003fcf71 RCX: ffffffffb7ebfdd6
+RDX: ffff888008bc2d00 RSI: 0000000000000000 RDI: ffff88806d329c80
+RBP: ffff88806d329c80 R08: 0000000000000001 R09: ffff888008bc2d1b
+R10: ffffed10011785a3 R11: 0000000000000001 R12: 000000000000c350
+R13: dffffc0000000000 R14: ffff888001fe7da0 R15: ffff88806d329cc0
+ lock_hrtimer_base kernel/time/hrtimer.c:173 [inline]
+ hrtimer_start_range_ns+0xc0/0xb30 kernel/time/hrtimer.c:1296
+ hrtimer_start_expires include/linux/hrtimer.h:432 [inline]
+ hrtimer_sleeper_start_expires kernel/time/hrtimer.c:1965 [inline]
+ do_nanosleep+0x10e/0x540 kernel/time/hrtimer.c:2041
+ hrtimer_nanosleep+0x192/0x3e0 kernel/time/hrtimer.c:2097
+ common_nsleep+0x90/0xb0 kernel/time/posix-timers.c:1236
+ __do_sys_clock_nanosleep kernel/time/posix-timers.c:1276 [inline]
+ __se_sys_clock_nanosleep kernel/time/posix-timers.c:1254 [inline]
+ __x64_sys_clock_nanosleep+0x2a1/0x3c0 kernel/time/posix-timers.c:1254
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7fb89203776a
+Code: d4 49 89 ce 83 ff 02 74 5f 85 ff 0f 94 c3 64 8b 04 25 18 00 00 00 85 c0 75 5e 4d 89 f2 4c 89 e2 44 89 ee b8 e6 00 00 00 0f 05 <48> 89 c5 41 89 ef 83 fd ea 75 04 84 db 75 6f 41 f7 df 48 8b 44 24
+RSP: 002b:00007ffee1fcda80 EFLAGS: 00000246 ORIG_RAX: 00000000000000e6
+RAX: ffffffffffffffda RBX: 0000000000003e01 RCX: 00007fb89203776a
+RDX: 00007ffee1fcdb10 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 00007ffee1fcdb9c R08: 000000000029972e R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffee1fcdb10
+R13: 0000000000000000 R14: 0000000000000000 R15: 00007ffee1fcdbc0
+ </TASK>
+
+The buggy address belongs to the page:
+page:00000000bd6b9c10 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1fe7
+flags: 0x100000000000000(node=0|zone=1)
+raw: 0100000000000000 0000000000000000 ffffea000007f9c8 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+addr ffff888001fe7b88 is located in stack of task syz-executor.4/427 at offset 0 in frame:
+ _raw_spin_lock_irqsave+0x0/0xe0 kernel/locking/spinlock.c:309
+
+this frame has 1 object:
+ [32, 36) 'val'
+
+Memory state around the buggy address:
+ ffff888001fe7a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888001fe7b00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff888001fe7b80: 00 f1 f1 f1 f1 04 f3 f3 f3 00 00 00 00 00 00 00
+                      ^
+ ffff888001fe7c00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888001fe7c80: 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00
+==================================================================
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+PM: Enabling pm_trace changes system date and time during resume.
+PM: Correct system time has to be restored manually after resume.
+----------------
+Code disassembly (best guess):
+   0:	48 c7 44 24 10 a0 d9 	movq   $0xffffffffba49d9a0,0x10(%rsp)
+   7:	49 ba
+   9:	48 01 d8             	add    %rbx,%rax
+   c:	c7 00 f1 f1 f1 f1    	movl   $0xf1f1f1f1,(%rax)
+  12:	c7 40 04 04 f3 f3 f3 	movl   $0xf3f3f304,0x4(%rax)
+  19:	65 48 8b 04 25 28 00 	mov    %gs:0x28,%rax
+  20:	00 00
+  22:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
+  27:	31 c0                	xor    %eax,%eax
+  29:	9c                   	pushf
+* 2a:	41 5c                	pop    %r12 <-- trapping instruction
+  2c:	fa                   	cli
+  2d:	be 04 00 00 00       	mov    $0x4,%esi
+  32:	c7 44 24 20 00 00 00 	movl   $0x0,0x20(%rsp)
+  39:	00
+  3a:	e8 f4 58 d6 fd       	call   0xfdd65933
+  3f:	be                   	.byte 0xbe

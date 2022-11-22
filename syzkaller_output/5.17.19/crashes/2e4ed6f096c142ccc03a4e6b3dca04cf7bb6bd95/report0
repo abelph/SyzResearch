@@ -1,0 +1,7 @@
+ioctl$FS_IOC_RESVSP(r0, 0x40305828, &(0x7f00000000c0)={0x0, 0x2, 0x0, 0x400})
+ioctl$SG_GET_ACCESS_COUNT(r0, 0x2289, &(0x7f0000000200))
+ioctl$FS_IOC_RESVSP(0xffffffffffffffff, 0x40305828, &(0x7f0000000140)={0x0, 0x0, 0x0, 0xffffffff})
+chown(&(0x7f0000000040)='./file0\x00', 0xffffffffffffffff, 0x0)
+2022/11/21 10:09:18 SYZFATAL: executor 1 failed 11 times: executor 1: EOF
+SYZFAIL: failed to mkdtemp
+ (errno 28: No space left on device)

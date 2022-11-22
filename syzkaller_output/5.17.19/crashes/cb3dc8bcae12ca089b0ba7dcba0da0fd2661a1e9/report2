@@ -1,0 +1,106 @@
+==================================================================
+BUG: KASAN: global-out-of-bounds in intel_pmu_lbr_read_64+0x805/0x810 arch/x86/events/intel/lbr.c:844
+Read of size 4 at addr ffffffffa140dd3c by task syz-executor.5/436
+
+CPU: 0 PID: 436 Comm: syz-executor.5 Not tainted 5.15.79 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <NMI>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x4d/0x66 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ intel_pmu_lbr_read_64+0x805/0x810 arch/x86/events/intel/lbr.c:844
+ intel_pmu_lbr_read+0x13e/0x190 arch/x86/events/intel/lbr.c:1015
+ intel_pmu_handle_irq+0x23a/0xd80 arch/x86/events/intel/core.c:2946
+ perf_event_nmi_handler arch/x86/events/core.c:1744 [inline]
+ perf_event_nmi_handler+0x3e/0x70 arch/x86/events/core.c:1730
+ nmi_handle+0xa0/0x200 arch/x86/kernel/nmi.c:140
+ default_do_nmi+0x3e/0xe0 arch/x86/kernel/nmi.c:334
+ exc_nmi+0xfd/0x130 arch/x86/kernel/nmi.c:510
+ end_repeat_nmi+0x16/0x67
+RIP: 0010:arch_static_branch arch/x86/include/asm/jump_label.h:27 [inline]
+RIP: 0010:static_key_false include/linux/jump_label.h:212 [inline]
+RIP: 0010:native_write_msr arch/x86/include/asm/msr.h:156 [inline]
+RIP: 0010:wrmsrl arch/x86/include/asm/msr.h:271 [inline]
+RIP: 0010:__intel_pmu_enable_all.constprop.0+0x99/0x270 arch/x86/events/intel/core.c:2171
+Code: ea 03 80 3c 02 00 0f 85 be 01 00 00 4c 8b a3 c0 0c 00 00 b9 8f 03 00 00 49 f7 d4 49 21 ec 4c 89 e2 44 89 e0 48 c1 ea 20 0f 30 <0f> 1f 44 00 00 e8 8d d0 36 00 e8 88 d0 36 00 4c 8d a3 00 02 00 00
+RSP: 0018:ffff888068609e40 EFLAGS: 00000002
+RAX: 000000000000000f RBX: ffff8880686217e0 RCX: 000000000000038f
+RDX: 0000000000000007 RSI: 0000000000000000 RDI: ffff8880686224a0
+RBP: 000000070000000f R08: 0000000000000000 R09: ffff8880686224a7
+R10: ffffed100d0c4494 R11: 0000000000000001 R12: 000000070000000f
+R13: 0000000040000001 R14: 000000000000030a R15: ffff8880081a48d0
+ </NMI>
+ <IRQ>
+ x86_pmu_enable+0x479/0xc50 arch/x86/events/core.c:1346
+ perf_pmu_enable kernel/events/core.c:1238 [inline]
+ perf_pmu_enable kernel/events/core.c:1234 [inline]
+ ctx_resched+0x20b/0x2c0 kernel/events/core.c:2803
+ __perf_install_in_context+0x35d/0x420 kernel/events/core.c:2870
+ remote_function kernel/events/core.c:92 [inline]
+ remote_function+0x10d/0x190 kernel/events/core.c:72
+ flush_smp_call_function_queue+0x134/0x450 kernel/smp.c:628
+ __sysvec_call_function_single+0x62/0x1d0 arch/x86/kernel/smp.c:248
+ sysvec_call_function_single+0x65/0x90 arch/x86/kernel/smp.c:243
+ </IRQ>
+ <TASK>
+ asm_sysvec_call_function_single+0x16/0x20 arch/x86/include/asm/idtentry.h:646
+RIP: 0010:__mutex_trylock_fast kernel/locking/mutex.c:165 [inline]
+RIP: 0010:mutex_lock+0x94/0xe0 kernel/locking/mutex.c:279
+Code: 00 00 48 c7 44 24 20 00 00 00 00 e8 c6 11 d7 fd be 08 00 00 00 48 8d 7c 24 20 e8 b7 11 d7 fd 48 8b 44 24 20 f0 4c 0f b1 65 00 <75> 2f 48 b8 00 00 00 00 00 fc ff df 48 c7 04 03 00 00 00 00 48 8b
+RSP: 0018:ffff88801eb97b48 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: 1ffff11003d72f69 RCX: ffffffffa0e92149
+RDX: ffffed1003d72f6e RSI: 0000000000000008 RDI: ffff88801eb97b68
+RBP: ffff888005b06600 R08: 0000000000000001 R09: ffff88801eb97b6f
+R10: ffffed1003d72f6d R11: 0000000000000001 R12: ffff888008553c00
+R13: 1ffff11003d72fa5 R14: ffff88801eb97d68 R15: 0000000000000000
+ __pipe_lock fs/pipe.c:102 [inline]
+ pipe_read+0x118/0xcd0 fs/pipe.c:243
+ call_read_iter include/linux/fs.h:2081 [inline]
+ new_sync_read+0x535/0x650 fs/read_write.c:404
+ vfs_read+0x26b/0x4d0 fs/read_write.c:485
+ ksys_read+0x19c/0x210 fs/read_write.c:623
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7f9af1591c22
+Code: d8 64 89 02 b8 ff ff ff ff eb b9 e8 68 3e 00 00 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 0f 05 <48> 3d 00 f0 ff ff 77 56 c3 0f 1f 44 00 00 48 83 ec 28 48 89 54 24
+RSP: 002b:00007ffe70eb9e98 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 00007ffe70eb9f70 RCX: 00007f9af1591c22
+RDX: 0000000000000040 RSI: 00007f9af16cd020 RDI: 00000000000000f9
+RBP: 0000000000000003 R08: 000000000000c000 R09: 0000000000004000
+R10: 00007ffe70eb9830 R11: 0000000000000246 R12: 0000000000000032
+R13: 0000000000112d53 R14: 0000000000000003 R15: 00007ffe70eb9f20
+ </TASK>
+
+The buggy address belongs to the variable:
+ lbr_desc+0x1c/0x340
+
+Memory state around the buggy address:
+ ffffffffa140dc00: 00 00 00 00 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00
+ ffffffffa140dc80: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
+>ffffffffa140dd00: f9 f9 f9 f9 00 00 00 04 f9 f9 f9 f9 00 03 f9 f9
+                                        ^
+ ffffffffa140dd80: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 05 f9 f9
+ ffffffffa140de00: f9 f9 f9 f9 00 00 00 03 f9 f9 f9 f9 00 00 00 00
+==================================================================
+perf: interrupt took too long (152276 > 26408), lowering kernel.perf_event_max_sample_rate to 1000
+perf: interrupt took too long (226631 > 190345), lowering kernel.perf_event_max_sample_rate to 1000
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	03 80 3c 02 00 0f    	add    0xf00023c(%rax),%eax
+   6:	85 be 01 00 00 4c    	test   %edi,0x4c000001(%rsi)
+   c:	8b a3 c0 0c 00 00    	mov    0xcc0(%rbx),%esp
+  12:	b9 8f 03 00 00       	mov    $0x38f,%ecx
+  17:	49 f7 d4             	not    %r12
+  1a:	49 21 ec             	and    %rbp,%r12
+  1d:	4c 89 e2             	mov    %r12,%rdx
+  20:	44 89 e0             	mov    %r12d,%eax
+  23:	48 c1 ea 20          	shr    $0x20,%rdx
+  27:	0f 30                	wrmsr
+* 29:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1) <-- trapping instruction
+  2e:	e8 8d d0 36 00       	call   0x36d0c0
+  33:	e8 88 d0 36 00       	call   0x36d0c0
+  38:	4c 8d a3 00 02 00 00 	lea    0x200(%rbx),%r12

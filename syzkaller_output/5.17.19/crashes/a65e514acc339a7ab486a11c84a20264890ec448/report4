@@ -1,0 +1,4 @@
+2022/11/21 22:21:35 SYZFATAL: executor 5 failed 11 times: executor 5: exit status 67
+SYZFAIL: failed to mkdir
+ (errno 28: No space left on device)
+loop exited with status 67

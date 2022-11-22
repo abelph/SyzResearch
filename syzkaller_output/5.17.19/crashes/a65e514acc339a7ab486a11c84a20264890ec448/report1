@@ -1,0 +1,7 @@
+setsockopt$inet6_IPV6_ADDRFORM(r0, 0x29, 0x1, &(0x7f0000000040), 0x4) (async, rerun: 32)
+getsockopt$IP6T_SO_GET_REVISION_MATCH(r0, 0x29, 0x44, &(0x7f00000000c0)={'NETMAP\x00'}, &(0x7f0000000100)=0x1e) (rerun: 32)
+sendmmsg$inet6(r0, &(0x7f0000001740)=[{{0x0, 0x0, 0x0}}], 0x1, 0x0)
+2022/11/21 13:26:45 SYZFATAL: executor 6 failed 11 times: executor 6: exit status 67
+SYZFAIL: failed to mkdir
+ (errno 28: No space left on device)
+loop exited with status 67

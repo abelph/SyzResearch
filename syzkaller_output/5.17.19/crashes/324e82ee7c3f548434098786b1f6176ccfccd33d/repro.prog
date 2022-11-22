@@ -1,0 +1,4 @@
+# {Threaded:false Repeat:true RepeatTimes:0 Procs:1 Slowdown:1 Sandbox: SandboxArg:0 Leak:false NetInjection:false NetDevices:false NetReset:false Cgroups:false BinfmtMisc:false CloseFDs:false KCSAN:false DevlinkPCI:false NicVF:false USB:false VhciInjection:false Wifi:false IEEE802154:false Sysctl:false UseTmpDir:false HandleSegv:false Repro:false Trace:false LegacyOptions:{Collide:false Fault:false FaultCall:0 FaultNth:0}}
+sendmsg$NL80211_CMD_SET_INTERFACE(0xffffffffffffffff, &(0x7f00000001c0)={0x0, 0x0, &(0x7f0000000180)={&(0x7f00000000c0)={0x34, 0x0, 0x0, 0x0, 0x0, {{}, {@val={0x8}, @val={0xc}}}, [@NL80211_ATTR_MESH_ID={0xa}]}, 0x34}, 0x1, 0x0, 0x0, 0x8800}, 0xd5)
+r0 = openat$sysfs(0xffffffffffffff9c, &(0x7f0000000000)='/sys/kernel/profiling', 0x82281, 0x0)
+write$P9_RREADDIR(r0, &(0x7f00000000c0)=ANY=[], 0x68)

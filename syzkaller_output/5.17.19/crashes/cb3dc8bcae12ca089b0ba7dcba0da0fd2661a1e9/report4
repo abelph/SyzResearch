@@ -1,0 +1,320 @@
+isofs_fill_super: bread failed, dev=loop5, iso_blknum=58, block=58
+==================================================================
+BUG: KASAN: global-out-of-bounds in intel_pmu_lbr_read_64+0x805/0x810 arch/x86/events/intel/lbr.c:844
+Read of size 4 at addr ffffffff9ac0dd3c by task syz-executor.0/10243
+
+CPU: 0 PID: 10243 Comm: syz-executor.0 Not tainted 5.15.79 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <NMI>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x4d/0x66 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ intel_pmu_lbr_read_64+0x805/0x810 arch/x86/events/intel/lbr.c:844
+ intel_pmu_lbr_read+0x13e/0x190 arch/x86/events/intel/lbr.c:1015
+ intel_pmu_handle_irq+0x23a/0xd80 arch/x86/events/intel/core.c:2946
+ perf_event_nmi_handler arch/x86/events/core.c:1744 [inline]
+ perf_event_nmi_handler+0x3e/0x70 arch/x86/events/core.c:1730
+ nmi_handle+0xa0/0x200 arch/x86/kernel/nmi.c:140
+ default_do_nmi+0x3e/0xe0 arch/x86/kernel/nmi.c:334
+ exc_nmi+0xfd/0x130 arch/x86/kernel/nmi.c:510
+ end_repeat_nmi+0x16/0x67
+RIP: 0010:arch_static_branch arch/x86/include/asm/jump_label.h:27 [inline]
+RIP: 0010:static_key_false include/linux/jump_label.h:212 [inline]
+RIP: 0010:native_write_msr arch/x86/include/asm/msr.h:156 [inline]
+RIP: 0010:wrmsrl arch/x86/include/asm/msr.h:271 [inline]
+RIP: 0010:__intel_pmu_enable_all.constprop.0+0x99/0x270 arch/x86/events/intel/core.c:2171
+Code: ea 03 80 3c 02 00 0f 85 be 01 00 00 4c 8b a3 c0 0c 00 00 b9 8f 03 00 00 49 f7 d4 49 21 ec 4c 89 e2 44 89 e0 48 c1 ea 20 0f 30 <0f> 1f 44 00 00 e8 8d d0 36 00 e8 88 d0 36 00 4c 8d a3 00 02 00 00
+RSP: 0018:ffff8880064c7718 EFLAGS: 00000002
+RAX: 000000000000000f RBX: ffff88806d2217e0 RCX: 000000000000038f
+RDX: 0000000000000007 RSI: 0000000000000000 RDI: ffff88806d2224a0
+RBP: 000000070000000f R08: 0000000000000000 R09: ffff88806d2224a7
+R10: ffffed100da44494 R11: 0000000000000001 R12: 000000070000000f
+R13: 0000000040000001 R14: 000000000000030a R15: ffff888006fdda70
+ </NMI>
+ <TASK>
+ x86_pmu_enable+0x479/0xc50 arch/x86/events/core.c:1346
+ perf_pmu_enable kernel/events/core.c:1238 [inline]
+ perf_pmu_enable kernel/events/core.c:1234 [inline]
+ perf_event_context_sched_in kernel/events/core.c:3988 [inline]
+ __perf_event_task_sched_in+0x62f/0x730 kernel/events/core.c:4026
+ perf_event_task_sched_in include/linux/perf_event.h:1210 [inline]
+ finish_task_switch.isra.0+0x36b/0x680 kernel/sched/core.c:4863
+ context_switch kernel/sched/core.c:4997 [inline]
+ __schedule+0x754/0x1890 kernel/sched/core.c:6341
+ schedule+0x108/0x220 kernel/sched/core.c:6424
+ freezable_schedule include/linux/freezer.h:172 [inline]
+ futex_wait_queue_me+0x24e/0x440 kernel/futex.c:2853
+ futex_wait+0x1c0/0x600 kernel/futex.c:2954
+ do_futex+0x31c/0x1840 kernel/futex.c:3964
+ __do_sys_futex kernel/futex.c:4041 [inline]
+ __se_sys_futex kernel/futex.c:4022 [inline]
+ __x64_sys_futex+0x19d/0x3f0 kernel/futex.c:4022
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7f43025adefd
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc23f52b58 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+RAX: ffffffffffffffda RBX: 0000000000000032 RCX: 00007f43025adefd
+RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007f43026ec05c
+RBP: 00007f43026ebf80 R08: 0000000000000001 R09: 00000000000000d0
+R10: 00007ffc23f52c40 R11: 0000000000000246 R12: 00000000001b2cc0
+R13: 00007ffc23f52c40 R14: 00007ffc23f52c60 R15: 00007f43026ec05c
+ </TASK>
+
+The buggy address belongs to the variable:
+ lbr_desc+0x1c/0x340
+
+Memory state around the buggy address:
+ ffffffff9ac0dc00: 00 00 00 00 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00
+ ffffffff9ac0dc80: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
+>ffffffff9ac0dd00: f9 f9 f9 f9 00 00 00 04 f9 f9 f9 f9 00 03 f9 f9
+                                        ^
+ ffffffff9ac0dd80: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 05 f9 f9
+ ffffffff9ac0de00: f9 f9 f9 f9 00 00 00 03 f9 f9 f9 f9 00 00 00 00
+==================================================================
+loop5: detected capacity change from 0 to 232
+isofs_fill_super: bread failed, dev=loop5, iso_blknum=58, block=58
+perf: interrupt took too long (110312 > 80960), lowering kernel.perf_event_max_sample_rate to 1000
+loop7: detected capacity change from 0 to 82
+EXT4-fs (loop7): Unrecognized mount option "“" or missing value
+loop4: detected capacity change from 0 to 16482
+loop7: detected capacity change from 0 to 82
+EXT4-fs (loop7): Unrecognized mount option "“" or missing value
+loop4: detected capacity change from 0 to 16482
+loop7: detected capacity change from 0 to 82
+loop4: detected capacity change from 0 to 16482
+EXT4-fs (loop7): Unrecognized mount option "“" or missing value
+loop5: detected capacity change from 0 to 232
+ISOFS: Unable to identify CD-ROM format.
+audit: type=1326 audit(2000001899.922:84): auid=0 uid=0 gid=0 ses=4 subj=system_u:system_r:kernel_t:s0 pid=10315 comm="syz-executor.0" exe="/syz-executor.0" sig=31 arch=c000003e syscall=202 compat=0 ip=0x7f43025adefd code=0x0
+loop4: detected capacity change from 0 to 16482
+loop5: detected capacity change from 0 to 232
+loop7: detected capacity change from 0 to 512
+ISOFS: Unable to identify CD-ROM format.
+EXT4-fs (loop7): invalid first ino: 0
+9pnet: Could not find request transport: rdma
+SELinux: security_context_str_to_sid(root) failed for (dev ?, type ?) errno=-22
+tmpfs: Unknown parameter 'appraise_type'
+audit: type=1326 audit(2000001900.278:85): auid=0 uid=0 gid=0 ses=4 subj=system_u:system_r:kernel_t:s0 pid=10331 comm="syz-executor.0" exe="/syz-executor.0" sig=31 arch=c000003e syscall=202 compat=0 ip=0x7f43025adefd code=0x0
+loop4: detected capacity change from 0 to 512
+loop5: detected capacity change from 0 to 232
+loop7: detected capacity change from 0 to 512
+audit: type=1326 audit(2000001900.481:86): auid=0 uid=0 gid=0 ses=4 subj=system_u:system_r:kernel_t:s0 pid=10345 comm="syz-executor.0" exe="/syz-executor.0" sig=31 arch=c000003e syscall=202 compat=0 ip=0x7f43025adefd code=0x0
+EXT4-fs (loop4): Ignoring removed orlov option
+ISOFS: Unable to identify CD-ROM format.
+audit: type=1326 audit(2000001900.563:87): auid=0 uid=0 gid=0 ses=4 subj=system_u:system_r:kernel_t:s0 pid=10345 comm="syz-executor.0" exe="/syz-executor.0" sig=31 arch=c000003e syscall=202 compat=0 ip=0x7f43025adefd code=0x0
+EXT4-fs (loop7): invalid first ino: 0
+EXT4-fs error (device loop4): __ext4_iget:4824: inode #2: block 4294903309: comm syz-executor.4: invalid block
+EXT4-fs (loop4): get root inode failed
+EXT4-fs (loop4): mount failed
+9pnet: Could not find request transport: rdma
+SELinux: security_context_str_to_sid(root) failed for (dev ?, type ?) errno=-22
+loop5: detected capacity change from 0 to 1024
+EXT4-fs error (device loop5): ext4_ext_check_inode:501: inode #2: comm syz-executor.5: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 1, max 4(4), depth 0(0)
+tmpfs: Unknown parameter 'appraise_type'
+EXT4-fs (loop5): get root inode failed
+EXT4-fs (loop5): mount failed
+loop4: detected capacity change from 0 to 512
+loop7: detected capacity change from 0 to 512
+EXT4-fs (loop7): invalid first ino: 0
+9pnet: Could not find request transport: rdma
+EXT4-fs (loop4): Ignoring removed orlov option
+SELinux: security_context_str_to_sid(root) failed for (dev ?, type ?) errno=-22
+EXT4-fs error (device loop4): __ext4_iget:4824: inode #2: block 4294903309: comm syz-executor.4: invalid block
+tmpfs: Unknown parameter 'appraise_type'
+EXT4-fs (loop4): get root inode failed
+EXT4-fs (loop4): mount failed
+loop5: detected capacity change from 0 to 1024
+EXT4-fs error (device loop5): ext4_ext_check_inode:501: inode #2: comm syz-executor.5: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 1, max 4(4), depth 0(0)
+EXT4-fs (loop5): get root inode failed
+EXT4-fs (loop5): mount failed
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop4: detected capacity change from 0 to 512
+loop1: detected capacity change from 0 to 4096
+EXT4-fs (loop4): Ignoring removed orlov option
+loop5: detected capacity change from 0 to 1024
+EXT4-fs error (device loop4): __ext4_iget:4824: inode #2: block 4294903309: comm syz-executor.4: invalid block
+EXT4-fs (loop4): get root inode failed
+EXT4-fs (loop4): mount failed
+EXT4-fs (loop1): unsupported descriptor size 0
+blktrace: Concurrent blktraces are not allowed on loop0
+loop1: detected capacity change from 0 to 4096
+loop5: detected capacity change from 0 to 512
+blktrace: Concurrent blktraces are not allowed on loop0
+EXT4-fs (loop1): unsupported descriptor size 0
+EXT4-fs (loop5): Unrecognized mount option "usrkq" or missing value
+loop1: detected capacity change from 0 to 4096
+loop7: detected capacity change from 0 to 4096
+EXT4-fs (loop7): unsupported descriptor size 0
+loop5: detected capacity change from 0 to 512
+EXT4-fs (loop5): Unrecognized mount option "usrkq" or missing value
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop1: detected capacity change from 0 to 536
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): bogus sectors per cluster 24
+loop5: detected capacity change from 0 to 512
+FAT-fs (loop6): Can't find a valid FAT filesystem
+EXT4-fs (loop1): VFS: Found ext4 filesystem with invalid superblock checksum.  Run e2fsck?
+blktrace: Concurrent blktraces are not allowed on loop0
+blktrace: Concurrent blktraces are not allowed on loop0
+loop6: detected capacity change from 0 to 512
+loop1: detected capacity change from 0 to 536
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+EXT4-fs (loop5): Unrecognized mount option "usrkq" or missing value
+EXT4-fs (loop1): VFS: Found ext4 filesystem with invalid superblock checksum.  Run e2fsck?
+blktrace: Concurrent blktraces are not allowed on loop0
+blktrace: Concurrent blktraces are not allowed on loop0
+loop1: detected capacity change from 0 to 536
+loop6: detected capacity change from 0 to 512
+loop5: detected capacity change from 0 to 512
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+EXT4-fs (loop1): VFS: Found ext4 filesystem with invalid superblock checksum.  Run e2fsck?
+EXT4-fs (loop5): mounted filesystem without journal. Opts: ,errors=continue. Quota mode: writeback.
+loop6: detected capacity change from 0 to 512
+ext4 filesystem being mounted at /syzkaller-testdir836094862/syzkaller.kUmk8C/819/file0 supports timestamps until 2038 (0x7fffffff)
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop5: detected capacity change from 0 to 512
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): invalid media value (0x00)
+FAT-fs (loop6): Can't find a valid FAT filesystem
+EXT4-fs (loop5): mounted filesystem without journal. Opts: ,errors=continue. Quota mode: writeback.
+ext4 filesystem being mounted at /syzkaller-testdir836094862/syzkaller.kUmk8C/820/file0 supports timestamps until 2038 (0x7fffffff)
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): invalid media value (0x00)
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop5: detected capacity change from 0 to 512
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): invalid media value (0x00)
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop4: detected capacity change from 0 to 264192
+FAT-fs (loop4): codepage cp949 not found
+loop4: detected capacity change from 0 to 264192
+FAT-fs (loop4): codepage cp949 not found
+loop4: detected capacity change from 0 to 264192
+FAT-fs (loop4): codepage cp949 not found
+loop5: detected capacity change from 0 to 736
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop5: detected capacity change from 0 to 736
+loop5: detected capacity change from 0 to 736
+loop6: detected capacity change from 0 to 512
+loop5: detected capacity change from 0 to 736
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop4: detected capacity change from 0 to 2048
+loop7: detected capacity change from 0 to 234
+EXT4-fs (loop4): VFS: Can't find ext4 filesystem
+loop0: detected capacity change from 0 to 16482
+attempt to access beyond end of device
+loop7: rw=0, want=235, limit=234
+FAT-fs (loop7): error, fat_free_clusters: deleting FAT entry beyond EOF
+FAT-fs (loop7): Filesystem has been set read-only
+attempt to access beyond end of device
+loop7: rw=0, want=235, limit=234
+loop0: detected capacity change from 0 to 16482
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+loop7: detected capacity change from 0 to 234
+loop4: detected capacity change from 0 to 2048
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop0: detected capacity change from 0 to 16482
+EXT4-fs (loop4): VFS: Can't find ext4 filesystem
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop6: detected capacity change from 0 to 512
+SELinux: security_context_str_to_sid(sysadm_u) failed for (dev ?, type ?) errno=-22
+FAT-fs (loop6): Unrecognized mount option "fsuuid=1aec770c-1cf8-6e11-0fcd-435dbc6>" or missing value
+loop4: detected capacity change from 0 to 2048
+loop7: detected capacity change from 0 to 234
+EXT4-fs (loop4): VFS: Can't find ext4 filesystem
+loop4: detected capacity change from 0 to 2048
+loop7: detected capacity change from 0 to 234
+EXT4-fs (loop4): VFS: Can't find ext4 filesystem
+loop7: detected capacity change from 0 to 234
+loop1: detected capacity change from 0 to 512
+EXT4-fs error (device loop1): ext4_fill_super:4828: inode #2: comm syz-executor.1: iget: root inode unallocated
+EXT4-fs (loop1): get root inode failed
+EXT4-fs (loop1): mount failed
+loop7: detected capacity change from 0 to 234
+loop6: detected capacity change from 0 to 512
+SELinux: security_context_str_to_sid(sysadm_u) failed for (dev ?, type ?) errno=-22
+FAT-fs (loop6): Unrecognized mount option "fsuuid=1aec770c-1cf8-6e11-0fcd-435dbc6>" or missing value
+loop4: detected capacity change from 0 to 512
+EXT4-fs (loop4): Ignoring removed orlov option
+loop7: detected capacity change from 0 to 234
+EXT4-fs (loop4): mounted filesystem without journal. Opts: orlov,inode_readahead_blks=0x0000000000000008,resgid=0x0000000000000000,grpquota,auto_da_alloc=0x0000000000000000,errors=remount-ro,nodiscard,init_itable,min_batch_time=0x0000000000000003,norecovery,. Quota mode: writeback.
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop7: detected capacity change from 0 to 234
+loop1: detected capacity change from 0 to 512
+loop7: detected capacity change from 0 to 234
+loop6: detected capacity change from 0 to 512
+SELinux: security_context_str_to_sid(sysadm_u) failed for (dev ?, type ?) errno=-22
+EXT4-fs error (device loop1): ext4_fill_super:4828: inode #2: comm syz-executor.1: iget: root inode unallocated
+attempt to access beyond end of device
+loop7: rw=0, want=235, limit=234
+new mount options do not match the existing superblock, will be ignored
+FAT-fs (loop6): Unrecognized mount option "fsuuid=1aec770c-1cf8-6e11-0fcd-435dbc6>" or missing value
+FAT-fs (loop7): error, fat_free_clusters: deleting FAT entry beyond EOF
+FAT-fs (loop7): Filesystem has been set read-only
+EXT4-fs (loop1): get root inode failed
+EXT4-fs (loop1): mount failed
+attempt to access beyond end of device
+loop7: rw=0, want=235, limit=234
+loop4: detected capacity change from 0 to 512
+loop6: detected capacity change from 0 to 512
+EXT4-fs (loop4): Ignoring removed orlov option
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+EXT4-fs (loop4): mounted filesystem without journal. Opts: orlov,inode_readahead_blks=0x0000000000000008,resgid=0x0000000000000000,grpquota,auto_da_alloc=0x0000000000000000,errors=remount-ro,nodiscard,init_itable,min_batch_time=0x0000000000000003,norecovery,. Quota mode: writeback.
+loop1: detected capacity change from 0 to 512
+new mount options do not match the existing superblock, will be ignored
+loop7: detected capacity change from 0 to 4096
+EXT4-fs (loop7): Unrecognized mount option "Ð" or missing value
+EXT4-fs error (device loop1): ext4_fill_super:4828: inode #2: comm syz-executor.1: iget: root inode unallocated
+EXT4-fs (loop1): get root inode failed
+new mount options do not match the existing superblock, will be ignored
+EXT4-fs (loop1): mount failed
+loop7: detected capacity change from 0 to 4096
+EXT4-fs (loop7): Unrecognized mount option "Ð" or missing value
+loop4: detected capacity change from 0 to 512
+loop6: detected capacity change from 0 to 512
+FAT-fs (loop6): bogus sectors per cluster 24
+FAT-fs (loop6): Can't find a valid FAT filesystem
+EXT4-fs (loop4): Ignoring removed orlov option
+EXT4-fs (loop4): mounted filesystem without journal. Opts: orlov,inode_readahead_blks=0x0000000000000008,resgid=0x0000000000000000,grpquota,auto_da_alloc=0x0000000000000000,errors=remount-ro,nodiscard,init_itable,min_batch_time=0x0000000000000003,norecovery,. Quota mode: writeback.
+loop7: detected capacity change from 0 to 4096
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	03 80 3c 02 00 0f    	add    0xf00023c(%rax),%eax
+   6:	85 be 01 00 00 4c    	test   %edi,0x4c000001(%rsi)
+   c:	8b a3 c0 0c 00 00    	mov    0xcc0(%rbx),%esp
+  12:	b9 8f 03 00 00       	mov    $0x38f,%ecx
+  17:	49 f7 d4             	not    %r12
+  1a:	49 21 ec             	and    %rbp,%r12
+  1d:	4c 89 e2             	mov    %r12,%rdx
+  20:	44 89 e0             	mov    %r12d,%eax
+  23:	48 c1 ea 20          	shr    $0x20,%rdx
+  27:	0f 30                	wrmsr
+* 29:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1) <-- trapping instruction
+  2e:	e8 8d d0 36 00       	call   0x36d0c0
+  33:	e8 88 d0 36 00       	call   0x36d0c0
+  38:	4c 8d a3 00 02 00 00 	lea    0x200(%rbx),%r12

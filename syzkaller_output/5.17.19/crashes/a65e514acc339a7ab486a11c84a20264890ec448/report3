@@ -1,0 +1,5 @@
+kallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkallersyzkal\x00\x00\x00\x00\x00\x00', 0x420, 0xa000}], 0x0, &(0x7f0000000580)=ANY=[@ANYBLOB="aa04bc7863966aa25354b1f56a5fe41d76f8ed8c68bbf33a0d56833b541b6fbdd96a60a014c9dcae87116d7652f974a964bc9c930ab14d19e939a3a2038cea07d11eb35bf0e1e811bd21e5316ae44a56c33859a4946766af07b608d00930a26b47a1c86eb132812a5998e09b11e041f452ff824925648428195bdb2b55438cf79b73259ab015dc8b0abb0c43ae5126dcc4cc"], 0x1) (async)
+2181/07/24 08:29:06 SYZFATAL: executor 3 failed 11 times: executor 3: exit status 67
+SYZFAIL: failed to mkdir
+ (errno 28: No space left on device)
+loop exited with status 67

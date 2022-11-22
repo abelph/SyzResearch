@@ -1,0 +1,87 @@
+==================================================================
+BUG: KASAN: stack-out-of-bounds in profile_pc+0x120/0x130 arch/x86/kernel/time.c:42
+Read of size 8 at addr ffff888006cafe80 by task syz-executor419/699
+
+CPU: 0 PID: 699 Comm: syz-executor419 Not tainted 5.15.79 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x4d/0x66 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ profile_pc+0x120/0x130 arch/x86/kernel/time.c:42
+ profile_tick+0x8f/0xd0 kernel/profile.c:416
+ tick_sched_timer+0x15b/0x1c0 kernel/time/tick-sched.c:1420
+ __run_hrtimer kernel/time/hrtimer.c:1685 [inline]
+ __hrtimer_run_queues+0x3bb/0x7c0 kernel/time/hrtimer.c:1749
+ hrtimer_interrupt+0x2c9/0x6c0 kernel/time/hrtimer.c:1811
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1086 [inline]
+ __sysvec_apic_timer_interrupt+0xc5/0x260 arch/x86/kernel/apic/apic.c:1103
+ sysvec_apic_timer_interrupt+0x65/0x90 arch/x86/kernel/apic/apic.c:1097
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x16/0x20 arch/x86/include/asm/idtentry.h:638
+RIP: 0010:_raw_write_lock_irq+0x4d/0xc6 kernel/locking/spinlock.c:315
+Code: f8 c2 cc bd 48 c1 eb 03 48 c7 44 24 10 50 e0 09 bd 48 01 d8 c7 00 f1 f1 f1 f1 c7 40 04 04 f3 f3 f3 65 48 8b 04 25 28 00 00 00 <48> 89 44 24 58 31 c0 fa be 04 00 00 00 c7 44 24 20 00 00 00 00 e8
+RSP: 0018:ffff888006cafe80 EFLAGS: 00000282
+RAX: dd8d7c34bda84f00 RBX: 1ffff11000d95fd0 RCX: ffffffffba96ff0f
+RDX: ffff888004e02d00 RSI: 0000000000000000 RDI: ffffffffbe00a080
+RBP: ffffffffbe00a080 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff888004e02d00
+R13: ffff888004e02d00 R14: 0000000000000000 R15: 0000000000000000
+ __do_sys_setpgid+0x7b/0x5c0 kernel/sys.c:1065
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7f7367e5df6b
+Code: 0f 1e fa b8 68 00 00 00 0f 05 c3 0f 1f 40 00 f3 0f 1e fa b8 6c 00 00 00 0f 05 c3 0f 1f 40 00 f3 0f 1e fa b8 6d 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc67e43e38 EFLAGS: 00000246 ORIG_RAX: 000000000000006d
+RAX: ffffffffffffffda RBX: 00000000000051a8 RCX: 00007f7367e5df6b
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000555556f5a3c0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffc67e43e4c
+R13: 431bde82d7b634db R14: 00007f7367eaf4f0 R15: 0000000000000001
+ </TASK>
+
+The buggy address belongs to the page:
+page:00000000bf285ae7 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x6caf
+flags: 0x100000000000000(node=0|zone=1)
+raw: 0100000000000000 0000000000000000 ffffea00001b2bc8 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+addr ffff888006cafe80 is located in stack of task syz-executor419/699 at offset 0 in frame:
+ _raw_write_lock_irq+0x0/0xc6 kernel/locking/spinlock.c:325
+
+this frame has 1 object:
+ [32, 36) 'cnts'
+
+Memory state around the buggy address:
+ ffff888006cafd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888006cafe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff888006cafe80: f1 f1 f1 f1 04 f3 f3 f3 00 00 00 00 00 00 00 00
+                   ^
+ ffff888006caff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888006caff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
+----------------
+Code disassembly (best guess):
+   0:	f8                   	clc
+   1:	c2 cc bd             	ret    $0xbdcc
+   4:	48 c1 eb 03          	shr    $0x3,%rbx
+   8:	48 c7 44 24 10 50 e0 	movq   $0xffffffffbd09e050,0x10(%rsp)
+   f:	09 bd
+  11:	48 01 d8             	add    %rbx,%rax
+  14:	c7 00 f1 f1 f1 f1    	movl   $0xf1f1f1f1,(%rax)
+  1a:	c7 40 04 04 f3 f3 f3 	movl   $0xf3f3f304,0x4(%rax)
+  21:	65 48 8b 04 25 28 00 	mov    %gs:0x28,%rax
+  28:	00 00
+* 2a:	48 89 44 24 58       	mov    %rax,0x58(%rsp) <-- trapping instruction
+  2f:	31 c0                	xor    %eax,%eax
+  31:	fa                   	cli
+  32:	be 04 00 00 00       	mov    $0x4,%esi
+  37:	c7 44 24 20 00 00 00 	movl   $0x0,0x20(%rsp)
+  3e:	00
+  3f:	e8                   	.byte 0xe8

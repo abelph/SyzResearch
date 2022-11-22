@@ -1,0 +1,44 @@
+==================================================================
+BUG: KASAN: global-out-of-bounds in intel_pmu_lbr_read_64+0x805/0x810 arch/x86/events/intel/lbr.c:844
+Read of size 4 at addr ffffffffa6a0dd3c by task syz-executor.1/32423
+
+CPU: 0 PID: 32423 Comm: syz-executor.1 Not tainted 5.15.79 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x4d/0x66 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ intel_pmu_lbr_read_64+0x805/0x810 arch/x86/events/intel/lbr.c:844
+ intel_pmu_lbr_read+0x13e/0x190 arch/x86/events/intel/lbr.c:1015
+ intel_pmu_handle_irq+0x23a/0xd80 arch/x86/events/intel/core.c:2946
+ perf_event_nmi_handler arch/x86/events/core.c:1744 [inline]
+ perf_event_nmi_handler+0x3e/0x70 arch/x86/events/core.c:1730
+ nmi_handle+0xa0/0x200 arch/x86/kernel/nmi.c:140
+ default_do_nmi+0x3e/0xe0 arch/x86/kernel/nmi.c:334
+ exc_nmi+0xfd/0x130 arch/x86/kernel/nmi.c:510
+ asm_exc_nmi+0xab/0xf4 arch/x86/entry/entry_64.S:1206
+RIP: 0033:0x7f524cd067d8
+Code: ff eb 9d 0f 1f 80 00 00 00 00 89 7c 24 0c e8 5f b2 ff ff 8b 7c 24 0c 4d 89 f2 4c 89 e2 41 89 c0 44 89 ee b8 e6 00 00 00 0f 05 <44> 89 c7 48 89 c5 e8 ad b2 ff ff eb 88 0f 1f 00 49 81 7c 24 08 ff
+RSP: 002b:00007f524ba22e30 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: 00007f524ce11001 RCX: 00007f524cd067d8
+RDX: 00007f524ba22ec0 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 00007f524cd44afc R08: 0000000000000000 R09: 0000000000000058
+R10: 0000000000000000 R11: 0000000000000293 R12: 00007f524ba22ec0
+R13: 0000000000000000 R14: 0000000000000000 R15: 00007f524ba03000
+ </TASK>
+
+The buggy address belongs to the variable:
+ lbr_desc+0x1c/0x340
+
+Memory state around the buggy address:
+ ffffffffa6a0dc00: 00 00 00 00 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00
+ ffffffffa6a0dc80: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
+>ffffffffa6a0dd00: f9 f9 f9 f9 00 00 00 04 f9 f9 f9 f9 00 03 f9 f9
+                                        ^
+ ffffffffa6a0dd80: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 05 f9 f9
+ ffffffffa6a0de00: f9 f9 f9 f9 00 00 00 03 f9 f9 f9 f9 00 00 00 00
+==================================================================
+perf: interrupt took too long (10662 > 10452), lowering kernel.perf_event_max_sample_rate to 18000

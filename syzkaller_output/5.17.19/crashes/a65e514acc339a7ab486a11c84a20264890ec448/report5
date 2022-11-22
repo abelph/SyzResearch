@@ -1,0 +1,5 @@
+mount$9p_fd(0x0, &(0x7f0000000040)='./file0\x00', &(0x7f0000000080), 0x0, &(0x7f00000001c0)={'trans=fd,', {'rfdno', 0x3d, r0}, 0x2c, {'wfdno', 0x3d, r1}, 0x2c, {[{@fscache}, {@msize}], [{@smackfsroot={'smackfsroot', 0x3d, '/dev/vcsu#\x00'}}, {@dont_hash}]}})
+2022/11/22 03:07:33 SYZFATAL: executor 0 failed 11 times: executor 0: exit status 67
+SYZFAIL: failed to mkdir
+ (errno 28: No space left on device)
+loop exited with status 67

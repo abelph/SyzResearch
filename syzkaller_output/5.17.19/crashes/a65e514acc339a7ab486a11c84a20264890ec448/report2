@@ -1,0 +1,9 @@
+ioprio_get$pid(0x2, r9) (async)
+ioctl$KDFONTOP_GET(r5, 0x4b72, &(0x7f00000002c0)={0x1, 0x0, 0xe, 0xf, 0x59, &(0x7f00000009c0)}) (async)
+14:39:17 executing program 5:
+mq_unlink(&(0x7f0000000000)='$\x00')
+openat$snapshot(0xffffffffffffff9c, &(0x7f0000000040), 0x841, 0x0)
+2223/07/06 14:40:27 SYZFATAL: executor 2 failed 11 times: executor 2: exit status 67
+SYZFAIL: failed to mkdir
+ (errno 28: No space left on device)
+loop exited with status 67

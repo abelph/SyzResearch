@@ -1,0 +1,5 @@
+mmap$binder(&(0x7f0000ffc000/0x4000)=nil, 0x4000, 0x1, 0x11, r0, 0x0) (async)
+2022/11/22 06:15:11 SYZFATAL: executor 4 failed 11 times: executor 4: exit status 67
+SYZFAIL: failed to mkdir
+ (errno 28: No space left on device)
+loop exited with status 67
