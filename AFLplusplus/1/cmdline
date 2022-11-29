@@ -1,0 +1,3 @@
+./fuzznetlink
+--dmesg
+dmesg.txt

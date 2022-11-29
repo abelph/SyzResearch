@@ -1,0 +1,3 @@
+# environment variables:
+# command line:
+'./AFLplusplus/afl-fuzz' '-i' '-' '-o' 'out' '--' './fuzznetlink' '--dmesg' 'dmesg.txt'
