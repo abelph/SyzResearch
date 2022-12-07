@@ -1,0 +1,1 @@
+2022/12/06 23:25:04 SYZFATAL: executor 4 failed 11 times: failed to start executor binary: fork/exec /syz-executor.4: permission denied

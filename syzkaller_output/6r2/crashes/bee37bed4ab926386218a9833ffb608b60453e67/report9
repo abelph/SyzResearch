@@ -1,0 +1,6 @@
+ioctl$sock_ipv6_tunnel_SIOCADDTUNNEL(0xffffffffffffffff, 0x89f1, &(0x7f0000000080)={'ip6gre0\x00', &(0x7f0000000000)={'ip6_vti0\x00', 0x0, 0x4, 0x0, 0x86, 0x1f, 0xd, @empty, @initdev={0xfe, 0x88, '\x00', 0x1, 0x0}, 0x20, 0x20, 0x7f, 0x56cc}})
+03:57:54 executing program 4:
+ioctl$F2FS_IOC_ABORT_ATOMIC_WRITE(0xffffffffffffffff, 0xf505, 0x0)
+r0 = syz_open_dev$usbmon(&(0x7f0000000380), 0x80000003, 0x0)
+mmap(&(0x7f0000ffd000/0x2000)=nil, 0x2000, 0x0, 0x12, r0, 0x0)
+2022/12/07 03:58:05 SYZFATAL: executor 0 failed 11 times: failed to start executor binary: fork/exec /syz-executor.0: permission denied

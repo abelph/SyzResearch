@@ -1,0 +1,5 @@
+2022/12/06 22:37:32 executed programs: 8
+2022/12/06 22:37:37 executed programs: 32
+2022/12/06 22:37:43 executed programs: 65
+2022/12/06 22:37:48 executed programs: 85
+2022/12/06 22:38:00 SYZFATAL: executor failed 11 times: failed to create temp dir: mkdir ./syzkaller-testdir335870192: no space left on device

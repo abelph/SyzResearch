@@ -1,0 +1,6 @@
+close(r0)
+03:40:03 executing program 6:
+fsopen(&(0x7f0000000080)='ufs\x00', 0x0)
+r0 = openat$cgroup_netprio_ifpriomap(0xffffffffffffffff, &(0x7f0000000000), 0x2, 0x0)
+close(r0)
+2022/12/07 03:40:16 SYZFATAL: executor 5 failed 11 times: failed to start executor binary: fork/exec /syz-executor.5: permission denied

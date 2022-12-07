@@ -1,0 +1,33 @@
+loop4: detected capacity change from 0 to 4096
+EXT4-fs (loop4): mounted filesystem without journal. Quota mode: none.
+EXT4-fs (loop4): unmounting filesystem.
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	1-...0: (15 ticks this GP) idle=c584/1/0x4000000000000000 softirq=133485/133487 fqs=3768
+	(detected by 0, t=21006 jiffies, g=227677, q=10384 ncpus=2)
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 14835 Comm: kworker/1:1 Not tainted 6.0.8 #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: events p9_read_work
+RIP: 0010:queued_spin_lock_slowpath+0x124/0xad0
+Code: 00 00 00 65 48 2b 04 25 28 00 00 00 0f 85 6d 08 00 00 48 81 c4 88 00 00 00 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc f3 90 <e9> 71 ff ff ff 44 8b 74 24 48 41 81 fe 00 01 00 00 0f 84 e3 00 00
+RSP: 0018:ffff8880604b7ac8 EFLAGS: 00000002
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffffffb52644a7
+RDX: ffffed100b99e081 RSI: 0000000000000004 RDI: ffff88805ccf0400
+RBP: ffff88805ccf0400 R08: 0000000000000000 R09: ffff88805ccf0403
+R10: ffffed100b99e080 R11: 0000000000000001 R12: 0000000000000003
+R13: ffffed100b99e080 R14: 0000000000000001 R15: 1ffff1100c096f5a
+FS:  0000000000000000(0000) GS:ffff88806d100000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055accac8b650 CR3: 0000000062120000 CR4: 0000000000350ee0
+Call Trace:
+ <TASK>
+ _raw_spin_lock_irqsave+0xd8/0xe0
+ p9_req_put+0xca/0x240
+ p9_conn_cancel+0x494/0x790
+ p9_read_work+0x51d/0xf80
+ process_one_work+0x83b/0x1170
+ worker_thread+0x5f7/0x1200
+ kthread+0x2af/0x360
+ ret_from_fork+0x1f/0x30
+ </TASK>
