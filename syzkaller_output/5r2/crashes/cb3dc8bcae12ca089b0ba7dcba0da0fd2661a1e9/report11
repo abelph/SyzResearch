@@ -1,0 +1,149 @@
+==================================================================
+BUG: KASAN: global-out-of-bounds in intel_pmu_lbr_read_64+0x959/0x960 arch/x86/events/intel/lbr.c:844
+Read of size 4 at addr ffffffffa4a0e8bc by task syz-executor.6/29859
+
+CPU: 0 PID: 29859 Comm: syz-executor.6 Not tainted 5.15.79 #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <NMI>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x6e/0x91 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ intel_pmu_lbr_read_64+0x959/0x960 arch/x86/events/intel/lbr.c:844
+ intel_pmu_lbr_read+0x165/0x1c0 arch/x86/events/intel/lbr.c:1015
+ intel_pmu_handle_irq+0x268/0xe70 arch/x86/events/intel/core.c:2946
+ perf_event_nmi_handler arch/x86/events/core.c:1744 [inline]
+ perf_event_nmi_handler+0x48/0x70 arch/x86/events/core.c:1730
+ nmi_handle+0xa0/0x200 arch/x86/kernel/nmi.c:140
+ default_do_nmi+0x3e/0xe0 arch/x86/kernel/nmi.c:334
+ exc_nmi+0xfd/0x130 arch/x86/kernel/nmi.c:510
+ end_repeat_nmi+0x16/0x67
+RIP: 0010:__cgroup_account_cputime+0x6e/0x90 kernel/cgroup/rstat.c:376
+Code: ff df 48 8d 7b 10 48 89 fa 48 c1 ea 03 80 3c 02 00 75 23 4c 01 63 10 48 89 ef 65 8b 35 93 82 2a 5e e8 e6 f7 ff ff 5b 5d 41 5c <c3> cc cc cc cc e8 28 15 2f 00 eb b3 e8 21 15 2f 00 eb d6 66 66 2e
+RSP: 0018:ffff88806d209c80 EFLAGS: 00000046
+RAX: 0000000080010000 RBX: ffff888005250fc0 RCX: ffffffffa1d792da
+RDX: ffff888005250f00 RSI: 0000000000000000 RDI: ffffe8ffffc0f430
+RBP: ffff888003568000 R08: 0000000000000000 R09: ffffffffa651e00f
+R10: ffffffffa651e017 R11: ffffffffa651e01b R12: 000000000130e437
+R13: ffff888005251010 R14: ffff888005250f00 R15: ffff8880076369c0
+ </NMI>
+ <IRQ>
+ cgroup_account_cputime include/linux/cgroup.h:797 [inline]
+ update_curr+0x280/0x4f0 kernel/sched/fair.c:853
+ enqueue_entity kernel/sched/fair.c:4303 [inline]
+ enqueue_task_fair+0x5fe/0x2120 kernel/sched/fair.c:5630
+ enqueue_task kernel/sched/core.c:1977 [inline]
+ activate_task kernel/sched/core.c:2002 [inline]
+ ttwu_do_activate.isra.0+0x16e/0x390 kernel/sched/core.c:3578
+ ttwu_queue kernel/sched/core.c:3787 [inline]
+ try_to_wake_up+0x45e/0xf90 kernel/sched/core.c:4110
+ hrtimer_wakeup+0x43/0x60 kernel/time/hrtimer.c:1939
+ __run_hrtimer kernel/time/hrtimer.c:1685 [inline]
+ __hrtimer_run_queues+0x3ff/0x860 kernel/time/hrtimer.c:1749
+ hrtimer_interrupt+0x2ed/0x730 kernel/time/hrtimer.c:1811
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1086 [inline]
+ __sysvec_apic_timer_interrupt+0xc5/0x260 arch/x86/kernel/apic/apic.c:1103
+ sysvec_apic_timer_interrupt+0x65/0x90 arch/x86/kernel/apic/apic.c:1097
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x16/0x20 arch/x86/include/asm/idtentry.h:638
+RIP: 0010:arch_local_irq_enable arch/x86/include/asm/irqflags.h:81 [inline]
+RIP: 0010:arch_local_irq_restore arch/x86/include/asm/irqflags.h:140 [inline]
+RIP: 0010:generic_exec_single+0x1f3/0x2e0 kernel/smp.c:520
+Code: 81 e3 00 02 00 00 4c 89 ef ff d5 0f 1f 00 31 ff 48 89 de e8 3f 4f 09 00 48 85 db 0f 84 f2 fe ff ff e8 91 55 09 00 fb 45 31 e4 <e9> e7 fe ff ff e8 83 55 09 00 0f 0b eb 91 4c 89 f7 e8 57 d1 33 00
+RSP: 0018:ffff888028cd7ba8 EFLAGS: 00000246
+RAX: 0000000000000919 RBX: 0000000000000200 RCX: ffffffff8132d68f
+RDX: 0000000000040000 RSI: ffffc90004360000 RDI: 0000000000000007
+RBP: ffffffffa1e98910 R08: 0000000000000007 R09: 0000000000000000
+R10: 0000000000000200 R11: 0000000000000001 R12: 0000000000000000
+R13: ffff888028cd7d08 R14: ffff888028cd7c28 R15: ffff888001fec468
+ smp_call_function_single+0x2fa/0x3d0 kernel/smp.c:755
+ cpu_function_call kernel/events/core.c:153 [inline]
+ perf_install_in_context+0x5c6/0x6b0 kernel/events/core.c:2932
+ __do_sys_perf_event_open+0x1ce2/0x2a70 kernel/events/core.c:12578
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7f1b4db15efd
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1b4c887028 EFLAGS: 00000246 ORIG_RAX: 000000000000012a
+RAX: ffffffffffffffda RBX: 00007f1b4dc53f80 RCX: 00007f1b4db15efd
+RDX: 0000000000000000 RSI: ffffffffffffffff RDI: 0000000020000040
+RBP: 00007f1b4db87afc R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000002 R14: 00007f1b4dc53f80 R15: 00007f1b4c867000
+ </TASK>
+
+The buggy address belongs to the variable:
+ lbr_desc+0x1c/0x340
+
+Memory state around the buggy address:
+ ffffffffa4a0e780: 00 00 00 00 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00
+ ffffffffa4a0e800: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
+>ffffffffa4a0e880: f9 f9 f9 f9 00 00 00 04 f9 f9 f9 f9 00 03 f9 f9
+                                        ^
+ ffffffffa4a0e900: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 05 f9 f9
+ ffffffffa4a0e980: f9 f9 f9 f9 00 00 00 03 f9 f9 f9 f9 00 00 00 00
+==================================================================
+perf: interrupt took too long (20921 > 20677), lowering kernel.perf_event_max_sample_rate to 9000
+perf: interrupt took too long (38761 > 26151), lowering kernel.perf_event_max_sample_rate to 5000
+perf: interrupt took too long (49046 > 48451), lowering kernel.perf_event_max_sample_rate to 4000
+perf: interrupt took too long (62141 > 61307), lowering kernel.perf_event_max_sample_rate to 3000
+perf: interrupt took too long (93807 > 77676), lowering kernel.perf_event_max_sample_rate to 2000
+perf: interrupt took too long (119503 > 117258), lowering kernel.perf_event_max_sample_rate to 1000
+perf: interrupt took too long (202171 > 149378), lowering kernel.perf_event_max_sample_rate to 1000
+perf: interrupt took too long (313920 > 252713), lowering kernel.perf_event_max_sample_rate to 1000
+__nla_validate_parse: 9 callbacks suppressed
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+9pnet: Could not find request transport: rdma
+9pnet: Could not find request transport: rdma
+9pnet: Could not find request transport: rdma
+__nla_validate_parse: 32 callbacks suppressed
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 44 bytes leftover after parsing attributes in process `syz-executor.5'.
+netlink: 36 bytes leftover after parsing attributes in process `syz-executor.2'.
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	df 48 8d             	fisttps -0x73(%rax)
+   3:	7b 10                	jnp    0x15
+   5:	48 89 fa             	mov    %rdi,%rdx
+   8:	48 c1 ea 03          	shr    $0x3,%rdx
+   c:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+  10:	75 23                	jne    0x35
+  12:	4c 01 63 10          	add    %r12,0x10(%rbx)
+  16:	48 89 ef             	mov    %rbp,%rdi
+  19:	65 8b 35 93 82 2a 5e 	mov    %gs:0x5e2a8293(%rip),%esi        # 0x5e2a82b3
+  20:	e8 e6 f7 ff ff       	call   0xfffff80b
+  25:	5b                   	pop    %rbx
+  26:	5d                   	pop    %rbp
+  27:	41 5c                	pop    %r12
+* 29:	c3                   	ret <-- trapping instruction
+  2a:	cc                   	int3
+  2b:	cc                   	int3
+  2c:	cc                   	int3
+  2d:	cc                   	int3
+  2e:	e8 28 15 2f 00       	call   0x2f155b
+  33:	eb b3                	jmp    0xffffffe8
+  35:	e8 21 15 2f 00       	call   0x2f155b
+  3a:	eb d6                	jmp    0x12
+  3c:	66                   	data16
+  3d:	66                   	data16
+  3e:	2e                   	cs

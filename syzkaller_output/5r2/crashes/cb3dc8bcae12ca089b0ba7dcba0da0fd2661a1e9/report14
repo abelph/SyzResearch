@@ -1,0 +1,341 @@
+==================================================================
+BUG: KASAN: global-out-of-bounds in intel_pmu_lbr_read_64+0x959/0x960 arch/x86/events/intel/lbr.c:844
+Read of size 4 at addr ffffffffab80e8bc by task syz-executor.2/975
+
+CPU: 0 PID: 975 Comm: syz-executor.2 Not tainted 5.15.79 #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <NMI>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x6e/0x91 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ intel_pmu_lbr_read_64+0x959/0x960 arch/x86/events/intel/lbr.c:844
+ intel_pmu_lbr_read+0x165/0x1c0 arch/x86/events/intel/lbr.c:1015
+ intel_pmu_handle_irq+0x268/0xe70 arch/x86/events/intel/core.c:2946
+ perf_event_nmi_handler arch/x86/events/core.c:1744 [inline]
+ perf_event_nmi_handler+0x48/0x70 arch/x86/events/core.c:1730
+ nmi_handle+0xa0/0x200 arch/x86/kernel/nmi.c:140
+ default_do_nmi+0x3e/0xe0 arch/x86/kernel/nmi.c:334
+ exc_nmi+0xfd/0x130 arch/x86/kernel/nmi.c:510
+ end_repeat_nmi+0x16/0x67
+RIP: 0010:arch_static_branch arch/x86/include/asm/jump_label.h:27 [inline]
+RIP: 0010:static_key_false include/linux/jump_label.h:212 [inline]
+RIP: 0010:native_write_msr arch/x86/include/asm/msr.h:156 [inline]
+RIP: 0010:wrmsrl arch/x86/include/asm/msr.h:271 [inline]
+RIP: 0010:__intel_pmu_enable_all.constprop.0+0x99/0x280 arch/x86/events/intel/core.c:2171
+Code: ea 03 80 3c 02 00 0f 85 ce 01 00 00 4c 8b a3 c0 0c 00 00 b9 8f 03 00 00 49 f7 d4 49 21 ec 4c 89 e2 44 89 e0 48 c1 ea 20 0f 30 <0f> 1f 44 00 00 e8 fd f1 39 00 e8 f8 f1 39 00 4c 8d a3 00 02 00 00
+RSP: 0018:ffff88802a807a30 EFLAGS: 00000002
+RAX: 000000000000000f RBX: ffff88806d2217e0 RCX: 000000000000038f
+RDX: 0000000000000007 RSI: 0000000000000000 RDI: ffff88806d2224a0
+RBP: 000000070000000f R08: 0000000000000006 R09: 0000000000000801
+R10: 0000000000000000 R11: 0000000000000001 R12: 000000070000000f
+R13: 0000000000000000 R14: ffff88806d2217e0 R15: dffffc0000000000
+ </NMI>
+ <TASK>
+ x86_pmu_enable+0x560/0xcc0 arch/x86/events/core.c:1346
+ perf_pmu_enable kernel/events/core.c:1238 [inline]
+ perf_pmu_enable kernel/events/core.c:1234 [inline]
+ ctx_resched+0x25a/0x320 kernel/events/core.c:2803
+ __perf_install_in_context+0x376/0x440 kernel/events/core.c:2870
+ remote_function kernel/events/core.c:92 [inline]
+ remote_function+0x123/0x1b0 kernel/events/core.c:72
+ generic_exec_single+0x1d4/0x2e0 kernel/smp.c:518
+ smp_call_function_single+0x2fa/0x3d0 kernel/smp.c:755
+ task_function_call kernel/events/core.c:120 [inline]
+ perf_install_in_context+0x2e6/0x6b0 kernel/events/core.c:2974
+ __do_sys_perf_event_open+0x1ce2/0x2a70 kernel/events/core.c:12578
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7f78ddc12efd
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f78dc921028 EFLAGS: 00000246 ORIG_RAX: 000000000000012a
+RAX: ffffffffffffffda RBX: 00007f78ddd511f0 RCX: 00007f78ddc12efd
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000020000380
+RBP: 00007f78ddc84afc R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f78ddd511f0 R15: 00007f78dc901000
+ </TASK>
+
+The buggy address belongs to the variable:
+ lbr_desc+0x1c/0x340
+
+Memory state around the buggy address:
+ ffffffffab80e780: 00 00 00 00 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00
+ ffffffffab80e800: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
+>ffffffffab80e880: f9 f9 f9 f9 00 00 00 04 f9 f9 f9 f9 00 03 f9 f9
+                                        ^
+ ffffffffab80e900: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 05 f9 f9
+ ffffffffab80e980: f9 f9 f9 f9 00 00 00 03 f9 f9 f9 f9 00 00 00 00
+==================================================================
+perf: interrupt took too long (13392 > 2500), lowering kernel.perf_event_max_sample_rate to 14000
+loop5: detected capacity change from 0 to 764
+loop1: detected capacity change from 0 to 1024
+EXT4-fs (loop1): mounted filesystem without journal. Opts: ,errors=continue. Quota mode: writeback.
+loop5: detected capacity change from 0 to 764
+loop1: detected capacity change from 0 to 1024
+loop5: detected capacity change from 0 to 764
+EXT4-fs (loop1): mounted filesystem without journal. Opts: ,errors=continue. Quota mode: writeback.
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop2: detected capacity change from 0 to 4368
+loop1: detected capacity change from 0 to 1024
+loop3: detected capacity change from 0 to 512
+EXT4-fs (loop2): Ignoring removed orlov option
+loop5: detected capacity change from 0 to 764
+EXT4-fs (loop1): mounted filesystem without journal. Opts: ,errors=continue. Quota mode: writeback.
+EXT4-fs (loop3): Unrecognized mount option "usrjquotq=./file0" or missing value
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+loop5: detected capacity change from 0 to 764
+EXT4-fs error (device loop2): ext4_ext_check_inode:501: inode #2: comm syz-executor.2: pblk 0 bad header/extent: invalid eh_entries - magic f30a, entries 65281, max 3(4), depth 0(0)
+EXT4-fs (loop2): get root inode failed
+EXT4-fs (loop2): mount failed
+loop5: detected capacity change from 0 to 764
+audit: type=1400 audit(2000000057.078:55): avc:  denied  { audit_read } for  pid=1167 comm="syz-executor.1" capability=37  scontext=system_u:system_r:kernel_t:s0 tcontext=system_u:system_r:kernel_t:s0 tclass=capability2 permissive=1
+loop3: detected capacity change from 0 to 512
+loop5: detected capacity change from 0 to 764
+EXT4-fs (loop3): Unrecognized mount option "usrjquotq=./file0" or missing value
+loop2: detected capacity change from 0 to 4368
+EXT4-fs (loop2): Ignoring removed orlov option
+EXT4-fs error (device loop2): ext4_ext_check_inode:501: inode #2: comm syz-executor.2: pblk 0 bad header/extent: invalid eh_entries - magic f30a, entries 65281, max 3(4), depth 0(0)
+EXT4-fs (loop2): get root inode failed
+EXT4-fs (loop2): mount failed
+loop2: detected capacity change from 0 to 4368
+loop2: detected capacity change from 0 to 4368
+loop7: detected capacity change from 0 to 128
+EXT4-fs (loop2): Ignoring removed orlov option
+EXT4-fs error (device loop2): ext4_ext_check_inode:501: inode #2: comm syz-executor.2: pblk 0 bad header/extent: invalid eh_entries - magic f30a, entries 65281, max 3(4), depth 0(0)
+platform regulatory.0: Direct firmware load for regulatory.db failed with error -2
+loop7: detected capacity change from 0 to 128
+EXT4-fs (loop2): get root inode failed
+EXT4-fs (loop2): mount failed
+loop7: detected capacity change from 0 to 128
+loop2: detected capacity change from 0 to 2048
+loop2: detected capacity change from 0 to 2048
+audit: type=1401 audit(2000000058.593:56): op=setxattr invalid_context=2F7362696E2F6468636C69656E7400
+loop0: detected capacity change from 0 to 2048
+audit: type=1401 audit(2000000058.734:57): op=setxattr invalid_context=2F7362696E2F6468636C69656E7400
+program syz-executor.3 is using a deprecated SCSI ioctl, please convert it to SG_IO
+EXT4-fs (loop0): Warning: mounting with an experimental mount option 'dioread_nolock' for blocksize < PAGE_SIZE
+EXT4-fs (loop0): Number of reserved GDT blocks insanely large: 22818
+loop2: detected capacity change from 0 to 2048
+ata2.00: exception Emask 0x0 SAct 0x0 SErr 0x0 action 0x6 frozen
+ata2.00: ATAPI check failed (ireason=0x2 bytes=4)
+ata2.00: cmd a0/00:00:00:04:00/00:00:00:00:00/a0 tag 0 pio 4 out
+         Request Sense 03 00 00 00 c9 00res 58/00:02:00:04:00/00:00:00:00:00/a0 Emask 0x2 (HSM violation)
+ata2.00: status: { DRDY DRQ }
+ata2: soft resetting link
+loop7: detected capacity change from 0 to 1024
+loop1: detected capacity change from 0 to 256
+ata2.00: configured for MWDMA2
+ata2: EH complete
+EXT4-fs error (device loop7): ext4_ext_check_inode:501: inode #4: comm syz-executor.7: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 2, max 4(4), depth 0(0)
+FAT-fs (loop1): Invalid FSINFO signature: 0x41615252, 0x61010173 (sector = 1)
+loop5: detected capacity change from 0 to 1024
+EXT4-fs (loop5): Mount option "nouser_xattr" will be removed by 3.5
+Contact linux-ext4@vger.kernel.org if you think we should keep it.
+
+loop0: detected capacity change from 0 to 2048
+EXT4-fs error (device loop5): ext4_ext_check_inode:501: inode #4: comm syz-executor.5: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 2, max 4(4), depth 0(0)
+EXT4-fs error (device loop7): ext4_quota_enable:6330: comm syz-executor.7: Bad quota inode # 4
+program syz-executor.3 is using a deprecated SCSI ioctl, please convert it to SG_IO
+loop6: detected capacity change from 0 to 131212
+EXT4-fs (loop0): Warning: mounting with an experimental mount option 'dioread_nolock' for blocksize < PAGE_SIZE
+EXT4-fs (loop0): Number of reserved GDT blocks insanely large: 22818
+ata2.00: exception Emask 0x0 SAct 0x0 SErr 0x0 action 0x6 frozen
+ata2.00: ATAPI check failed (ireason=0x2 bytes=4)
+ata2.00: cmd a0/00:00:00:04:00/00:00:00:00:00/a0 tag 0 pio 4 out
+         Request Sense 03 00 00 00 c9 00res 58/00:02:00:04:00/00:00:00:00:00/a0 Emask 0x2 (HSM violation)
+loop1: detected capacity change from 0 to 256
+ata2.00: status: { DRDY DRQ }
+ata2: soft resetting link
+EXT4-fs error (device loop5): ext4_quota_enable:6330: comm syz-executor.5: Bad quota inode # 4
+EXT4-fs warning (device loop7): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+EXT4-fs warning (device loop5): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+EXT4-fs (loop7): mount failed
+EXT4-fs (loop5): mount failed
+FAT-fs (loop1): Invalid FSINFO signature: 0x41615252, 0x61010173 (sector = 1)
+loop6: detected capacity change from 0 to 131212
+ata2.00: configured for MWDMA2
+ata2: EH complete
+loop0: detected capacity change from 0 to 2048
+EXT4-fs error (device loop6): ext4_quota_enable:6328: inode #4: comm syz-executor.6: iget: bad extended attribute block 267152801550310
+loop7: detected capacity change from 0 to 1024
+EXT4-fs error (device loop6): ext4_quota_enable:6330: comm syz-executor.6: Bad quota inode # 4
+loop5: detected capacity change from 0 to 1024
+EXT4-fs (loop5): Mount option "nouser_xattr" will be removed by 3.5
+Contact linux-ext4@vger.kernel.org if you think we should keep it.
+
+EXT4-fs warning (device loop6): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+program syz-executor.3 is using a deprecated SCSI ioctl, please convert it to SG_IO
+EXT4-fs (loop6): mount failed
+EXT4-fs (loop0): Warning: mounting with an experimental mount option 'dioread_nolock' for blocksize < PAGE_SIZE
+EXT4-fs (loop0): Number of reserved GDT blocks insanely large: 22818
+EXT4-fs error (device loop7): ext4_ext_check_inode:501: inode #4: comm syz-executor.7: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 2, max 4(4), depth 0(0)
+program syz-executor.3 is using a deprecated SCSI ioctl, please convert it to SG_IO
+loop1: detected capacity change from 0 to 256
+EXT4-fs error (device loop5): ext4_ext_check_inode:501: inode #4: comm syz-executor.5: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 2, max 4(4), depth 0(0)
+FAT-fs (loop1): Invalid FSINFO signature: 0x41615252, 0x61010173 (sector = 1)
+ata2.00: exception Emask 0x0 SAct 0x0 SErr 0x0 action 0x6 frozen
+ata2.00: ATAPI check failed (ireason=0x2 bytes=4)
+ata2.00: cmd a0/00:00:00:04:00/00:00:00:00:00/a0 tag 0 pio 4 out
+         Request Sense 03 00 00 00 c9 00res 58/00:02:00:04:00/00:00:00:00:00/a0 Emask 0x2 (HSM violation)
+ata2.00: status: { DRDY DRQ }
+ata2: soft resetting link
+EXT4-fs error (device loop7): ext4_quota_enable:6330: comm syz-executor.7: Bad quota inode # 4
+EXT4-fs error (device loop5): ext4_quota_enable:6330: comm syz-executor.5: Bad quota inode # 4
+EXT4-fs warning (device loop7): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+EXT4-fs warning (device loop5): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+loop6: detected capacity change from 0 to 131212
+EXT4-fs (loop7): mount failed
+EXT4-fs (loop5): mount failed
+ata2.00: configured for MWDMA2
+EXT4-fs error (device loop6): ext4_quota_enable:6328: inode #4: comm syz-executor.6: iget: bad extended attribute block 267152801550310
+ata2: EH complete
+ata2.00: exception Emask 0x0 SAct 0x0 SErr 0x0 action 0x6 frozen
+ata2.00: ATAPI check failed (ireason=0x2 bytes=4)
+ata2.00: cmd a0/00:00:00:04:00/00:00:00:00:00/a0 tag 0 pio 4 out
+         Request Sense 03 00 00 00 c9 00res 58/00:02:00:04:00/00:00:00:00:00/a0 Emask 0x2 (HSM violation)
+ata2.00: status: { DRDY DRQ }
+ata2: soft resetting link
+EXT4-fs error (device loop6): ext4_quota_enable:6330: comm syz-executor.6: Bad quota inode # 4
+loop5: detected capacity change from 0 to 1024
+loop7: detected capacity change from 0 to 1024
+EXT4-fs warning (device loop6): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+EXT4-fs (loop5): Mount option "nouser_xattr" will be removed by 3.5
+Contact linux-ext4@vger.kernel.org if you think we should keep it.
+
+EXT4-fs error (device loop7): ext4_ext_check_inode:501: inode #4: comm syz-executor.7: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 2, max 4(4), depth 0(0)
+EXT4-fs (loop6): mount failed
+EXT4-fs error (device loop5): ext4_ext_check_inode:501: inode #4: comm syz-executor.5: pblk 0 bad header/extent: invalid extent entries - magic f30a, entries 2, max 4(4), depth 0(0)
+EXT4-fs error (device loop7): ext4_quota_enable:6330: comm syz-executor.7: Bad quota inode # 4
+ata2.00: configured for MWDMA2
+ata2: EH complete
+EXT4-fs warning (device loop7): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+EXT4-fs error (device loop5): ext4_quota_enable:6330: comm syz-executor.5: Bad quota inode # 4
+EXT4-fs warning (device loop5): ext4_enable_quotas:6367: Failed to enable quota tracking (type=1, err=-117). Please run e2fsck to fix.
+EXT4-fs (loop7): mount failed
+EXT4-fs (loop5): mount failed
+loop6: detected capacity change from 0 to 511
+loop6: detected capacity change from 0 to 511
+loop6: detected capacity change from 0 to 511
+loop5: detected capacity change from 0 to 732
+loop3: detected capacity change from 0 to 1024
+loop1: detected capacity change from 0 to 164
+EXT4-fs (loop3): ext4_check_descriptors: Inode bitmap for group 0 not in group (block 4)!
+EXT4-fs (loop3): group descriptors corrupted!
+loop7: detected capacity change from 0 to 2048
+EXT4-fs error (device loop7): ext4_fill_super:4828: inode #2: comm syz-executor.7: iget: bogus i_mode (101)
+EXT4-fs (loop7): get root inode failed
+EXT4-fs (loop7): mount failed
+loop5: detected capacity change from 0 to 732
+loop3: detected capacity change from 0 to 1024
+EXT4-fs (loop3): ext4_check_descriptors: Inode bitmap for group 0 not in group (block 4)!
+EXT4-fs (loop3): group descriptors corrupted!
+loop3: detected capacity change from 0 to 1024
+EXT4-fs (loop3): ext4_check_descriptors: Inode bitmap for group 0 not in group (block 4)!
+EXT4-fs (loop3): group descriptors corrupted!
+loop7: detected capacity change from 0 to 2048
+EXT4-fs error (device loop7): ext4_fill_super:4828: inode #2: comm syz-executor.7: iget: bogus i_mode (101)
+loop1: detected capacity change from 0 to 164
+EXT4-fs (loop7): get root inode failed
+EXT4-fs (loop7): mount failed
+loop3: detected capacity change from 0 to 1024
+EXT4-fs (loop3): ext4_check_descriptors: Inode bitmap for group 0 not in group (block 4)!
+EXT4-fs (loop3): group descriptors corrupted!
+loop7: detected capacity change from 0 to 2048
+EXT4-fs error (device loop7): ext4_fill_super:4828: inode #2: comm syz-executor.7: iget: bogus i_mode (101)
+EXT4-fs (loop7): get root inode failed
+EXT4-fs (loop7): mount failed
+loop5: detected capacity change from 0 to 732
+loop7: detected capacity change from 0 to 2048
+loop1: detected capacity change from 0 to 164
+EXT4-fs error (device loop7): ext4_fill_super:4828: inode #2: comm syz-executor.7: iget: bogus i_mode (101)
+loop0: detected capacity change from 0 to 2048
+EXT4-fs (loop0): Unrecognized mount option "i" or missing value
+EXT4-fs (loop7): get root inode failed
+EXT4-fs (loop7): mount failed
+loop0: detected capacity change from 0 to 2048
+EXT4-fs (loop0): Unrecognized mount option "i" or missing value
+loop0: detected capacity change from 0 to 2048
+EXT4-fs (loop0): Unrecognized mount option "i" or missing value
+loop0: detected capacity change from 0 to 2048
+EXT4-fs (loop0): Unrecognized mount option "i" or missing value
+SELinux: security_context_str_to_sid(user_u) failed for (dev ?, type ?) errno=-22
+tmpfs: Bad value for 'defcontext'
+dns_resolver: Unsupported server list version (8)
+dns_resolver: Unsupported server list version (8)
+loop0: detected capacity change from 0 to 128
+dns_resolver: Unsupported server list version (8)
+SELinux: security_context_str_to_sid(user_u) failed for (dev ?, type ?) errno=-22
+tmpfs: Bad value for 'defcontext'
+loop1: detected capacity change from 0 to 320
+EXT4-fs error (device loop0): ext4_fill_super:4828: inode #2: comm syz-executor.0: iget: checksum invalid
+SELinux: security_context_str_to_sid(user_u) failed for (dev ?, type ?) errno=-22
+tmpfs: Bad value for 'defcontext'
+EXT4-fs (loop0): get root inode failed
+EXT4-fs (loop0): mount failed
+EXT4-fs (loop1): VFS: Can't find ext4 filesystem
+loop1: detected capacity change from 0 to 320
+loop0: detected capacity change from 0 to 128
+EXT4-fs (loop1): VFS: Can't find ext4 filesystem
+EXT4-fs error (device loop0): ext4_fill_super:4828: inode #2: comm syz-executor.0: iget: checksum invalid
+EXT4-fs (loop0): get root inode failed
+EXT4-fs (loop0): mount failed
+loop1: detected capacity change from 0 to 320
+loop0: detected capacity change from 0 to 128
+EXT4-fs (loop1): VFS: Can't find ext4 filesystem
+EXT4-fs error (device loop0): ext4_fill_super:4828: inode #2: comm syz-executor.0: iget: checksum invalid
+EXT4-fs (loop0): get root inode failed
+EXT4-fs (loop0): mount failed
+loop5: detected capacity change from 0 to 2048
+EXT4-fs (loop5): filesystem is read-only
+EXT4-fs (loop5): Number of reserved GDT blocks insanely large: 42378
+loop5: detected capacity change from 0 to 2048
+EXT4-fs (loop5): filesystem is read-only
+EXT4-fs (loop5): Number of reserved GDT blocks insanely large: 42378
+loop5: detected capacity change from 0 to 2048
+EXT4-fs (loop5): filesystem is read-only
+EXT4-fs (loop5): Number of reserved GDT blocks insanely large: 42378
+audit: type=1326 audit(2000000063.362:58): auid=0 uid=0 gid=0 ses=4 subj=system_u:system_r:kernel_t:s0 pid=2172 comm="syz-executor.3" exe="/syz-executor.3" sig=31 arch=c000003e syscall=202 compat=0 ip=0x7f26c98bbefd code=0x0
+loop0: detected capacity change from 0 to 8
+audit: type=1326 audit(2000000064.233:59): auid=0 uid=0 gid=0 ses=4 subj=system_u:system_r:kernel_t:s0 pid=2250 comm="syz-executor.3" exe="/syz-executor.3" sig=31 arch=c000003e syscall=202 compat=0 ip=0x7f26c98bbefd code=0x0
+audit: type=1326 audit(2000000064.358:60): auid=0 uid=0 gid=0 ses=4 subj=system_u:system_r:kernel_t:s0 pid=2287 comm="syz-executor.3" exe="/syz-executor.3" sig=31 arch=c000003e syscall=202 compat=0 ip=0x7f26c98bbefd code=0x0
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	03 80 3c 02 00 0f    	add    0xf00023c(%rax),%eax
+   6:	85 ce                	test   %ecx,%esi
+   8:	01 00                	add    %eax,(%rax)
+   a:	00 4c 8b a3          	add    %cl,-0x5d(%rbx,%rcx,4)
+   e:	c0 0c 00 00          	rorb   $0x0,(%rax,%rax,1)
+  12:	b9 8f 03 00 00       	mov    $0x38f,%ecx
+  17:	49 f7 d4             	not    %r12
+  1a:	49 21 ec             	and    %rbp,%r12
+  1d:	4c 89 e2             	mov    %r12,%rdx
+  20:	44 89 e0             	mov    %r12d,%eax
+  23:	48 c1 ea 20          	shr    $0x20,%rdx
+  27:	0f 30                	wrmsr
+* 29:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1) <-- trapping instruction
+  2e:	e8 fd f1 39 00       	call   0x39f230
+  33:	e8 f8 f1 39 00       	call   0x39f230
+  38:	4c 8d a3 00 02 00 00 	lea    0x200(%rbx),%r12

@@ -1,0 +1,155 @@
+==================================================================
+BUG: KASAN: use-after-free in task_work_run+0x130/0x1c0 kernel/task_work.c:163
+Read of size 8 at addr ffff888004995070 by task syz-executor244/1408
+
+CPU: 1 PID: 1408 Comm: syz-executor244 Not tainted 5.15.79 #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x6e/0x91 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ task_work_run+0x130/0x1c0 kernel/task_work.c:163
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0xa2c/0x24b0 kernel/exit.c:825
+ do_group_exit+0x113/0x310 kernel/exit.c:922
+ get_signal+0x40e/0x2050 kernel/signal.c:2889
+ arch_do_signal_or_restart+0x2ba/0x1780 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0xc7/0x130 kernel/entry/common.c:207
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+ syscall_exit_to_user_mode+0x1d/0x40 kernel/entry/common.c:300
+ do_syscall_64+0x48/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7f4175bec03d
+Code: Unable to access opcode bytes at RIP 0x7f4175bec013.
+RSP: 002b:00007ffc11215a18 EFLAGS: 00000246 ORIG_RAX: 000000000000012a
+RAX: 0000000000000003 RBX: 0000000000000003 RCX: 00007f4175bec03d
+RDX: 0000000000000001 RSI: 0000000000000000 RDI: 0000000020000380
+RBP: 0000000000000000 R08: 000000000000000b R09: 00007ffc11215aa0
+R10: 00000000ffffffff R11: 0000000000000246 R12: 00007ffc11215a38
+R13: 00007ffc11215a60 R14: 00000000000003fc R15: 00007ffc11215aa0
+ </TASK>
+
+Allocated by task 1408:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:434 [inline]
+ __kasan_slab_alloc+0x61/0x80 mm/kasan/common.c:467
+ kasan_slab_alloc include/linux/kasan.h:254 [inline]
+ slab_post_alloc_hook mm/slab.h:519 [inline]
+ slab_alloc_node mm/slub.c:3220 [inline]
+ kmem_cache_alloc_node+0xdb/0x200 mm/slub.c:3256
+ perf_event_alloc.part.0+0xb9/0x2cc0 kernel/events/core.c:11631
+ perf_event_alloc kernel/events/core.c:12182 [inline]
+ __do_sys_perf_event_open+0x4ad/0x2a70 kernel/events/core.c:12280
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+
+Freed by task 68:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x40 mm/kasan/generic.c:360
+ ____kasan_slab_free mm/kasan/common.c:366 [inline]
+ ____kasan_slab_free mm/kasan/common.c:328 [inline]
+ __kasan_slab_free+0xec/0x120 mm/kasan/common.c:374
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:1705 [inline]
+ slab_free_freelist_hook mm/slub.c:1731 [inline]
+ slab_free mm/slub.c:3499 [inline]
+ kmem_cache_free+0x71/0x270 mm/slub.c:3515
+ rcu_do_batch kernel/rcu/tree.c:2509 [inline]
+ rcu_core+0x554/0x14e0 kernel/rcu/tree.c:2749
+ __do_softirq+0x180/0x537 kernel/softirq.c:558
+
+Last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xa9/0xc0 mm/kasan/generic.c:348
+ __call_rcu kernel/rcu/tree.c:2993 [inline]
+ call_rcu+0x77/0x9b0 kernel/rcu/tree.c:3073
+ put_event kernel/events/core.c:5186 [inline]
+ perf_event_release_kernel+0x613/0x810 kernel/events/core.c:5301
+ perf_release+0x33/0x50 kernel/events/core.c:5311
+ __fput+0x250/0xa20 fs/file_table.c:280
+ task_work_run+0x102/0x1c0 kernel/task_work.c:164
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0xa2c/0x24b0 kernel/exit.c:825
+ do_group_exit+0x113/0x310 kernel/exit.c:922
+ get_signal+0x40e/0x2050 kernel/signal.c:2889
+ arch_do_signal_or_restart+0x2ba/0x1780 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0xc7/0x130 kernel/entry/common.c:207
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+ syscall_exit_to_user_mode+0x1d/0x40 kernel/entry/common.c:300
+ do_syscall_64+0x48/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xa9/0xc0 mm/kasan/generic.c:348
+ task_work_add+0x3b/0x190 kernel/task_work.c:38
+ event_sched_out.part.0+0x7ec/0x980 kernel/events/core.c:2370
+ event_sched_out kernel/events/core.c:2411 [inline]
+ group_sched_out.part.0+0x267/0x420 kernel/events/core.c:2402
+ group_sched_out kernel/events/core.c:2397 [inline]
+ ctx_sched_out+0x6cf/0x950 kernel/events/core.c:3366
+ task_ctx_sched_out kernel/events/core.c:2740 [inline]
+ perf_event_context_sched_out kernel/events/core.c:3584 [inline]
+ __perf_event_task_sched_out+0x5fe/0x14f0 kernel/events/core.c:3687
+ perf_event_task_sched_out include/linux/perf_event.h:1233 [inline]
+ prepare_task_switch kernel/sched/core.c:4798 [inline]
+ context_switch kernel/sched/core.c:4946 [inline]
+ __schedule+0xbed/0x1890 kernel/sched/core.c:6341
+ preempt_schedule_common kernel/sched/core.c:6517 [inline]
+ __cond_resched+0x42/0x80 kernel/sched/core.c:8209
+ ext4_journal_check_start+0x1a/0x2a0 fs/ext4/ext4_jbd2.c:68
+ __ext4_journal_start_sb+0x41/0x310 fs/ext4/ext4_jbd2.c:98
+ __ext4_journal_start fs/ext4/ext4_jbd2.h:326 [inline]
+ ext4_dirty_inode+0x9d/0x110 fs/ext4/inode.c:5945
+ __mark_inode_dirty+0x124/0xba0 fs/fs-writeback.c:2431
+ mark_inode_dirty include/linux/fs.h:2377 [inline]
+ generic_write_end+0x1ed/0x380 fs/buffer.c:2204
+ ext4_da_write_end+0x179/0x7b0 fs/ext4/inode.c:3084
+ generic_perform_write+0x2c1/0x510 mm/filemap.c:3786
+ ext4_buffered_write_iter+0x244/0x510 fs/ext4/file.c:269
+ ext4_file_write_iter+0x3c6/0x18a0 fs/ext4/file.c:687
+ __kernel_write+0x58c/0xb30 fs/read_write.c:539
+ __dump_emit+0x18e/0x270 fs/coredump.c:875
+ dump_emit+0x23b/0x520 fs/coredump.c:912
+ elf_core_dump+0x1e3a/0x3020 fs/binfmt_elf.c:2237
+ do_coredump+0x2a0b/0x3e70 fs/coredump.c:826
+ get_signal+0x38b/0x2050 kernel/signal.c:2875
+ arch_do_signal_or_restart+0x2ba/0x1780 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0xc7/0x130 kernel/entry/common.c:207
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+ syscall_exit_to_user_mode+0x1d/0x40 kernel/entry/common.c:300
+ do_syscall_64+0x48/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+
+The buggy address belongs to the object at ffff888004994d38
+ which belongs to the cache perf_event of size 1000
+The buggy address is located 824 bytes inside of
+ 1000-byte region [ffff888004994d38, ffff888004995120)
+The buggy address belongs to the page:
+page:00000000e2f0b334 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x4994
+head:00000000e2f0b334 order:2 compound_mapcount:0 compound_pincount:0
+flags: 0x100000000010200(slab|head|node=0|zone=1)
+raw: 0100000000010200 ffffea0000240600 0000000200000002 ffff88800104ddc0
+raw: 0000000000000000 00000000800e000e 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888004994f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888004994f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888004995000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                             ^
+ ffff888004995080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888004995100: fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================

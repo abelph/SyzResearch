@@ -1,0 +1,165 @@
+==================================================================
+BUG: KASAN: use-after-free in task_work_run+0x130/0x1c0 kernel/task_work.c:163
+Read of size 8 at addr ffff888007a8e210 by task syz-executor.0/7263
+
+CPU: 0 PID: 7263 Comm: syz-executor.0 Not tainted 5.15.79 #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x6e/0x91 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ task_work_run+0x130/0x1c0 kernel/task_work.c:163
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0xa2c/0x24b0 kernel/exit.c:825
+ do_group_exit+0x113/0x310 kernel/exit.c:922
+ get_signal+0x40e/0x2050 kernel/signal.c:2889
+ arch_do_signal_or_restart+0x2ba/0x1780 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0xc7/0x130 kernel/entry/common.c:207
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+ syscall_exit_to_user_mode+0x1d/0x40 kernel/entry/common.c:300
+ do_syscall_64+0x48/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+RIP: 0033:0x7f870116cefd
+Code: Unable to access opcode bytes at RIP 0x7f870116ced3.
+RSP: 002b:00007f86ffede028 EFLAGS: 00000246 ORIG_RAX: 000000000000012a
+RAX: 0000000000000003 RBX: 00007f87012aaf80 RCX: 00007f870116cefd
+RDX: 0000000000000001 RSI: 0000000000000000 RDI: 0000000020000380
+RBP: 00007f87011deafc R08: 000000000000000b R09: 0000000000000000
+R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000006 R14: 00007f87012aaf80 R15: 00007f86ffebe000
+ </TASK>
+
+Allocated by task 7263:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:434 [inline]
+ __kasan_slab_alloc+0x61/0x80 mm/kasan/common.c:467
+ kasan_slab_alloc include/linux/kasan.h:254 [inline]
+ slab_post_alloc_hook mm/slab.h:519 [inline]
+ slab_alloc_node mm/slub.c:3220 [inline]
+ kmem_cache_alloc_node+0xdb/0x200 mm/slub.c:3256
+ perf_event_alloc.part.0+0xb9/0x2cc0 kernel/events/core.c:11631
+ perf_event_alloc kernel/events/core.c:12182 [inline]
+ __do_sys_perf_event_open+0x4ad/0x2a70 kernel/events/core.c:12280
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+
+Freed by task 17:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x40 mm/kasan/generic.c:360
+ ____kasan_slab_free mm/kasan/common.c:366 [inline]
+ ____kasan_slab_free mm/kasan/common.c:328 [inline]
+ __kasan_slab_free+0xec/0x120 mm/kasan/common.c:374
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:1705 [inline]
+ slab_free_freelist_hook mm/slub.c:1731 [inline]
+ slab_free mm/slub.c:3499 [inline]
+ kmem_cache_free+0x71/0x270 mm/slub.c:3515
+ rcu_do_batch kernel/rcu/tree.c:2509 [inline]
+ rcu_core+0x554/0x14e0 kernel/rcu/tree.c:2749
+ __do_softirq+0x180/0x537 kernel/softirq.c:558
+
+Last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xa9/0xc0 mm/kasan/generic.c:348
+ __call_rcu kernel/rcu/tree.c:2993 [inline]
+ call_rcu+0x77/0x9b0 kernel/rcu/tree.c:3073
+ put_event kernel/events/core.c:5186 [inline]
+ perf_event_release_kernel+0x613/0x810 kernel/events/core.c:5301
+ perf_release+0x33/0x50 kernel/events/core.c:5311
+ __fput+0x250/0xa20 fs/file_table.c:280
+ task_work_run+0x102/0x1c0 kernel/task_work.c:164
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0xa2c/0x24b0 kernel/exit.c:825
+ do_group_exit+0x113/0x310 kernel/exit.c:922
+ get_signal+0x40e/0x2050 kernel/signal.c:2889
+ arch_do_signal_or_restart+0x2ba/0x1780 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0xc7/0x130 kernel/entry/common.c:207
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+ syscall_exit_to_user_mode+0x1d/0x40 kernel/entry/common.c:300
+ do_syscall_64+0x48/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xa9/0xc0 mm/kasan/generic.c:348
+ task_work_add+0x3b/0x190 kernel/task_work.c:38
+ event_sched_out.part.0+0x7ec/0x980 kernel/events/core.c:2370
+ event_sched_out kernel/events/core.c:2411 [inline]
+ group_sched_out.part.0+0x267/0x420 kernel/events/core.c:2402
+ group_sched_out kernel/events/core.c:2397 [inline]
+ ctx_sched_out+0x6cf/0x950 kernel/events/core.c:3366
+ task_ctx_sched_out kernel/events/core.c:2740 [inline]
+ perf_event_context_sched_out kernel/events/core.c:3584 [inline]
+ __perf_event_task_sched_out+0x5fe/0x14f0 kernel/events/core.c:3687
+ perf_event_task_sched_out include/linux/perf_event.h:1233 [inline]
+ prepare_task_switch kernel/sched/core.c:4798 [inline]
+ context_switch kernel/sched/core.c:4946 [inline]
+ __schedule+0xbed/0x1890 kernel/sched/core.c:6341
+ preempt_schedule_common kernel/sched/core.c:6517 [inline]
+ __cond_resched+0x42/0x80 kernel/sched/core.c:8209
+ __wait_for_common kernel/sched/completion.c:101 [inline]
+ wait_for_common kernel/sched/completion.c:117 [inline]
+ wait_for_completion+0x7a/0x280 kernel/sched/completion.c:138
+ coredump_wait fs/coredump.c:473 [inline]
+ do_coredump+0x604/0x3e70 fs/coredump.c:633
+ get_signal+0x38b/0x2050 kernel/signal.c:2875
+ arch_do_signal_or_restart+0x2ba/0x1780 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0xc7/0x130 kernel/entry/common.c:207
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+ syscall_exit_to_user_mode+0x1d/0x40 kernel/entry/common.c:300
+ do_syscall_64+0x48/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x61/0xcb
+
+The buggy address belongs to the object at ffff888007a8ded8
+ which belongs to the cache perf_event of size 1000
+The buggy address is located 824 bytes inside of
+ 1000-byte region [ffff888007a8ded8, ffff888007a8e2c0)
+The buggy address belongs to the page:
+page:000000003f3817ea refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7a8c
+head:000000003f3817ea order:2 compound_mapcount:0 compound_pincount:0
+flags: 0x100000000010200(slab|head|node=0|zone=1)
+raw: 0100000000010200 0000000000000000 0000000100000001 ffff88800104ddc0
+raw: 0000000000000000 00000000000e000e 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888007a8e100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888007a8e180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888007a8e200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                         ^
+ ffff888007a8e280: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888007a8e300: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
+==================================================================
+selinux_netlink_send: 58 callbacks suppressed
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7448 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7484 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7515 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7563 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7581 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7623 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7631 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7665 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7690 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7722 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7801 comm=syz-executor.7
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7834 comm=syz-executor.7
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7872 comm=syz-executor.7
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7903 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7919 comm=syz-executor.7
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7951 comm=syz-executor.7
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=7979 comm=syz-executor.7
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=8003 comm=syz-executor.7
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=8019 comm=syz-executor.0
+SELinux: unrecognized netlink message: protocol=9 nlmsg_type=0 sclass=netlink_audit_socket pid=8038 comm=syz-executor.0

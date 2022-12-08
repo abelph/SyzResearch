@@ -1,0 +1,52 @@
+==================================================================
+BUG: KASAN: global-out-of-bounds in intel_pmu_lbr_read_64+0x959/0x960 arch/x86/events/intel/lbr.c:844
+Read of size 4 at addr ffffffff8c00e8bc by task syz-fuzzer/16403
+
+CPU: 0 PID: 16403 Comm: syz-fuzzer Not tainted 5.15.79 #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x6e/0x91 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x1f/0x140 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x7f/0x11b mm/kasan/report.c:459
+ intel_pmu_lbr_read_64+0x959/0x960 arch/x86/events/intel/lbr.c:844
+ intel_pmu_lbr_read+0x165/0x1c0 arch/x86/events/intel/lbr.c:1015
+ intel_pmu_handle_irq+0x268/0xe70 arch/x86/events/intel/core.c:2946
+ perf_event_nmi_handler arch/x86/events/core.c:1744 [inline]
+ perf_event_nmi_handler+0x48/0x70 arch/x86/events/core.c:1730
+ nmi_handle+0xa0/0x200 arch/x86/kernel/nmi.c:140
+ default_do_nmi+0x3e/0xe0 arch/x86/kernel/nmi.c:334
+ exc_nmi+0xfd/0x130 arch/x86/kernel/nmi.c:510
+ asm_exc_nmi+0xab/0xf4 arch/x86/entry/entry_64.S:1206
+RIP: 0033:0x52cbf2
+Code: 00 00 48 8d 1d af 42 48 00 48 39 de 0f 85 15 05 00 00 49 8b 31 4d 8b 49 08 49 39 d1 0f 86 fb 04 00 00 48 c1 e2 04 4c 8b 0c 16 <48> 8b 54 32 08 48 8d 35 9a 3d 82 00 66 90 49 39 f1 75 4c 48 8d 70
+RSP: 002b:000000c000b9ce98 EFLAGS: 00000206
+RAX: 000000c0009ee5e0 RBX: 00000000009b0e80 RCX: 000000c002c15800
+RDX: 0000000000056f30 RSI: 000000c00078e000 RDI: 0000000000ab9317
+RBP: 000000c000b9d010 R08: 0000000001fa22a8 R09: 0000000000d50998
+R10: 000000000000000a R11: 0000000000d0bd51 R12: 000000c000b9cf18
+R13: 0000000000000000 R14: 000000c000007860 R15: 00007f3c703bdac2
+ </TASK>
+
+The buggy address belongs to the variable:
+ lbr_desc+0x1c/0x340
+
+Memory state around the buggy address:
+ ffffffff8c00e780: 00 00 00 00 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00
+ ffffffff8c00e800: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
+>ffffffff8c00e880: f9 f9 f9 f9 00 00 00 04 f9 f9 f9 f9 00 03 f9 f9
+                                        ^
+ ffffffff8c00e900: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 05 f9 f9
+ ffffffff8c00e980: f9 f9 f9 f9 00 00 00 03 f9 f9 f9 f9 00 00 00 00
+==================================================================
+perf: interrupt took too long (10218 > 10078), lowering kernel.perf_event_max_sample_rate to 19000
+perf: interrupt took too long (16306 > 16192), lowering kernel.perf_event_max_sample_rate to 12000
+perf: interrupt took too long (20615 > 20382), lowering kernel.perf_event_max_sample_rate to 9000
+perf: interrupt took too long (89484 > 25768), lowering kernel.perf_event_max_sample_rate to 2000
+perf: interrupt took too long (232910 > 111855), lowering kernel.perf_event_max_sample_rate to 1000
+audit: type=1400 audit(1670397990.215:43): avc:  denied  { audit_read } for  pid=24746 comm="syz-executor.3" capability=37  scontext=system_u:system_r:kernel_t:s0 tcontext=system_u:system_r:kernel_t:s0 tclass=capability2 permissive=1
+perf: interrupt took too long (352051 > 291137), lowering kernel.perf_event_max_sample_rate to 1000
+perf: interrupt took too long (474177 > 440063), lowering kernel.perf_event_max_sample_rate to 1000
+perf: interrupt took too long (645253 > 592721), lowering kernel.perf_event_max_sample_rate to 1000
